@@ -1,0 +1,6 @@
+[package]
+name = "postgres-interval"
+version = "0.0.1"
+authors = ["rpiper"]
+
+[dependencies]
