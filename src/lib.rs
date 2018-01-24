@@ -123,7 +123,11 @@ fn get_day_time_interval(hours: i64, minutes: i64, seconds: f64) -> String {
     } else if hours == 0 && minutes != 0 && seconds == 0.0  {
         format!("T{:#?}M", minutes)
     } else if hours == 0 && minutes == 0 && seconds != 0.0 {
-        format!("T{:#?}S", seconds)
+        if !has_frac {
+            format!("T{:#?}S", seconds)
+        } else {
+            format!("T{:#?}S", seconds as i64)
+        }
     } else if hours != 0 && minutes == 0 && seconds != 0.0 {
         if !has_frac {
             format!("T{:#?}H{:#?}S", hours, seconds)
