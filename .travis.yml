@@ -2,11 +2,6 @@ language: rust
 cache: cargo
 sudo: true
 
-rust:
-  - stable
-  - beta
-  - nightly
-
 env:
   global:
   - RUSTFLAGS="-C link-dead-code"
