@@ -217,4 +217,41 @@ mod tests {
         assert_eq!(String::from("00:00:00"), interval);
     }
 
+    #[test]
+    fn test_get_day_time_interval_11() {
+        let hour: i64 = 0;
+        let minutes: i64 =  0;
+        let seconds: f64 = 11.0;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("00:00:11"), interval);
+    }
+
+    #[test]
+    fn test_get_day_time_interval_12() {
+        let hour: i64 = 0;
+        let minutes: i64 =  0;
+        let seconds: f64 = 11.2;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("00:00:11.2"), interval);
+    }
+
+    #[test]
+    fn test_get_day_time_interval_13() {
+        let hour: i64 = 0;
+        let minutes: i64 =  0;
+        let seconds: f64 = -11.2;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("-00:00:11.2"), interval);
+    }
+
+    #[test]
+    fn test_get_day_time_interval_14() {
+        let hour: i64 = -1;
+        let minutes: i64 =  0;
+        let seconds: f64 = 11.2;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("-01:00:11.2"), interval);
+    }
+
+
 }
