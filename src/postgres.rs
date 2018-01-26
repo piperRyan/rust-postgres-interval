@@ -1,4 +1,4 @@
-// Helper function to help derive the year month interval for a iso-8601
+// Helper function to help derive the year month interval for a postgres
 // compliant string.
 pub fn get_year_month_interval(years: i32, months: i32, days: i32) -> Option<String> {
     if years != 0 && months != 0  && days != 0 {
@@ -20,7 +20,7 @@ pub fn get_year_month_interval(years: i32, months: i32, days: i32) -> Option<Str
     }
 }
 
-// Helper function to help derive the day-time interval for a iso-8601
+// Helper function to help derive the day-time interval for a postgres
 // compliant string.
 pub fn get_day_time_interval(hours: i64, minutes: i64, seconds: f64) -> String {
     let fmt_seconds = |secs: f64 | -> String {
