@@ -1,4 +1,4 @@
-// Helper function to help derive the year month interval for a iso-8601
+// Helper function to help derive the year month interval for a postgres
 // compliant string.
 pub fn get_year_month_interval(years: i32, months: i32, days: i32) -> Option<String> {
     if years != 0 && months != 0  && days != 0 {
@@ -20,7 +20,7 @@ pub fn get_year_month_interval(years: i32, months: i32, days: i32) -> Option<Str
     }
 }
 
-// Helper function to help derive the day-time interval for a iso-8601
+// Helper function to help derive the day-time interval for a postgres
 // compliant string.
 pub fn get_day_time_interval(hours: i64, minutes: i64, seconds: f64) -> String {
     let fmt_seconds = |secs: f64 | -> String {
@@ -216,5 +216,42 @@ mod tests {
         let interval = super::get_day_time_interval(hour,minutes,seconds);
         assert_eq!(String::from("00:00:00"), interval);
     }
+
+    #[test]
+    fn test_get_day_time_interval_11() {
+        let hour: i64 = 0;
+        let minutes: i64 =  0;
+        let seconds: f64 = 11.0;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("00:00:11"), interval);
+    }
+
+    #[test]
+    fn test_get_day_time_interval_12() {
+        let hour: i64 = 0;
+        let minutes: i64 =  0;
+        let seconds: f64 = 11.2;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("00:00:11.2"), interval);
+    }
+
+    #[test]
+    fn test_get_day_time_interval_13() {
+        let hour: i64 = 0;
+        let minutes: i64 =  0;
+        let seconds: f64 = -11.2;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("-00:00:11.2"), interval);
+    }
+
+    #[test]
+    fn test_get_day_time_interval_14() {
+        let hour: i64 = -1;
+        let minutes: i64 =  0;
+        let seconds: f64 = 11.2;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("-01:00:11.2"), interval);
+    }
+
 
 }

@@ -224,4 +224,24 @@ mod tests {
         assert_eq!(String::from("T0S"), interval);
     }
 
+    #[test]
+    fn test_get_day_time_interval_11() {
+        let hour: i64 = 0;
+        let minutes: i64 =  1;
+        let seconds: f64 = 1.0;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("T1M1S"), interval);
+    }
+
+    #[test]
+    fn test_get_day_time_interval_12() {
+        let hour: i64 = 1;
+        let minutes: i64 =  0;
+        let seconds: f64 = 1.0;
+        let interval = super::get_day_time_interval(hour,minutes,seconds);
+        assert_eq!(String::from("T1H1S"), interval);
+    }
+
+
+
 }
