@@ -1,3 +1,8 @@
+mod iso_8601;
+mod postgres;
+use std::ops;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Interval {
   months: i32,
   days: i32,
@@ -7,11 +12,6 @@ pub struct Interval {
 impl Interval {
     /// Create a new instance of interval from the months, days, and microseconds.
     pub fn new(months: i32, days: i32, microseconds: i64) -> Interval {
-        // the interval must be either all postive or all negative values.
-        debug_assert!(
-            (months >= 0 && days >= 0 && microseconds >= 0) ||
-            (months <= 0 && days <= 0 && microseconds <= 0)
-        );
         Interval {
             months: months,
             days: days,
@@ -48,6 +48,69 @@ impl Interval {
             year_months_interval
         } else {
             year_months_interval
+        }
+    }
+
+    /// Output the interval as a postgres interval string.
+    pub fn to_postgres(&self) -> String {
+        let (years, months) = get_years_months(self.months);
+        let days = self.days;
+        let year_months_interval = postgres::get_year_month_interval(years, months, days);
+        let (remaining_microseconds, hours) = get_hours(self.microseconds);
+        let (remaining_microseconds, minutes) = get_minutes(remaining_microseconds);
+        let seconds = get_seconds(remaining_microseconds);
+        if self.microseconds != 0 && year_months_interval.is_some() {
+                let mut ym_interval = year_months_interval.unwrap();
+                let day_time_interval = postgres::get_day_time_interval(hours, minutes, seconds);
+                ym_interval = ym_interval + " " + &*day_time_interval;
+                ym_interval
+        } else if year_months_interval.is_some() && self.microseconds == 0 {
+            year_months_interval.unwrap()
+        } else {
+            postgres::get_day_time_interval(hours, minutes, seconds)
+        }
+    }
+
+    /// Checked interval addition. Computes `Interval + Interval` and `None` if there
+    /// was an overflow.
+    pub fn checked_add(self, other_interval: Interval) -> Option<Interval> {
+        Some(Interval {
+            months: self.months.checked_add(other_interval.months)?,
+            days: self.days.checked_add(other_interval.days)?,
+            microseconds: self.microseconds.checked_add(other_interval.microseconds)?
+        })
+    }
+
+    /// Checked interval subtraction. Computes `Interval - Interval` and `None` if there
+    /// was an underflow.
+    pub fn checked_sub(self, other_interval: Interval) -> Option<Interval> {
+        Some(Interval {
+            months: self.months.checked_sub(other_interval.months)?,
+            days: self.days.checked_sub(other_interval.days)?,
+            microseconds: self.microseconds.checked_sub(other_interval.microseconds)?
+        })
+    }
+
+}
+
+impl ops::Add for Interval {
+    type Output = Interval;
+    fn add(self, other_interval: Interval) -> Interval {
+        Interval {
+            months: self.months + other_interval.months,
+            days: self.days + other_interval.months,
+            microseconds: self.microseconds + other_interval.microseconds
+        }
+    }
+}
+
+impl ops::Sub for Interval {
+    type Output = Interval;
+    fn sub(self, other_interval: Interval) -> Interval {
+        Interval {
+            months: self.months - other_interval.months,
+            days: self.days - other_interval.days,
+            microseconds: self.microseconds - other_interval.microseconds
         }
     }
 }
