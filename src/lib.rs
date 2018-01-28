@@ -78,7 +78,6 @@ impl Interval {
     pub fn checked_add(self, other_interval: Interval) -> Option<Interval> {
         Some(Interval {
             months: self.months.checked_add(other_interval.months)?,
-            pub fn checked_sub(self, other_interval: Interval) -> Option<Interval> {
             days: self.days.checked_add(other_interval.days)?,
             microseconds: self.microseconds.checked_add(other_interval.microseconds)?
         })
@@ -86,6 +85,7 @@ impl Interval {
 
     /// Checked interval subtraction. Computes `Interval - Interval` and `None` if there
     /// was an underflow.
+    pub fn checked_sub(self, other_interval: Interval) -> Option<Interval> {
         Some(Interval {
             months: self.months.checked_sub(other_interval.months)?,
             days: self.days.checked_sub(other_interval.days)?,
@@ -98,7 +98,7 @@ impl Interval {
     pub fn  add_day_time(self, days: i32, hours: i64, minutes: i64, seconds: f64) -> Interval {
             let hours_as_micro: i64 = hours *3600000000;
             let minutes_as_micro: i64 = minutes * 60000000;
-            let seconds_as_micro: i64 = (seconds * 1000000.0) as i64;
+            let seconds_as_micro: i64 = (seconds * 1000000.0).floor() as i64;
             let additional_micro: i64 = hours_as_micro + minutes_as_micro + seconds_as_micro;
             Interval {
                 months: self.months,
@@ -112,7 +112,7 @@ impl Interval {
     pub fn  sub_day_time(self, days: i32, hours: i64, minutes: i64, seconds: f64) -> Interval {
             let hours_as_micro: i64 = hours *3600000000;
             let minutes_as_micro: i64 = minutes * 60000000;
-            let seconds_as_micro: i64 = (seconds * 1000000.0) as i64;
+            let seconds_as_micro: i64 = (seconds * 1000000.0).floor() as i64;
             let additional_micro: i64 = hours_as_micro + minutes_as_micro + seconds_as_micro;
             Interval {
                 months: self.months,
@@ -124,14 +124,15 @@ impl Interval {
     /// Checked day time interval addition. Computes the interval and will return `None` if a
     /// overflow has occured. Any units smaller than a microsecond will be truncated.
     pub fn checked_add_day_time(self, days: i32, hours: i64, minutes: i64, seconds: f64) -> Option<Interval> {
+
             let hours_as_micro: i64 = hours.checked_mul(3600000000)?;
             let minutes_as_micro: i64 = minutes.checked_mul(60000000)?;
-            let seconds_as_micro: i64 = (seconds.checked_mul(1000000)?) as i64;
+            let seconds_as_micro: i64 = (seconds * 1000000.0).floor() as i64;
             let additional_micro: i64 = hours_as_micro.checked_add(minutes_as_micro)?
                                                       .checked_add(seconds_as_micro)?;
             Some(Interval {
                 months: self.months,
-                days: self.days.checked_add(days),
+                days: self.days.checked_add(days)?,
                 microseconds: self.microseconds.checked_add(additional_micro)?
             })
     }
@@ -141,7 +142,7 @@ impl Interval {
     pub fn checked_sub_day_time(self, days: i32,  hours: i64, minutes: i64, seconds: f64) -> Option<Interval> {
             let hours_as_micro: i64 = hours.checked_mul(3600000000)?;
             let minutes_as_micro: i64 = minutes.checked_mul(60000000)?;
-            let seconds_as_micro: i64 = (seconds.checked_mul(1000000)?) as i64;
+            let seconds_as_micro: i64 = (seconds * 1000000.0).floor() as i64;
             let subtracted_micro: i64 = hours_as_micro.checked_add(minutes_as_micro)?
                                                       .checked_add(seconds_as_micro)?;
             Some(Interval {
@@ -176,16 +177,17 @@ impl Interval {
     /// Checked year month addition. Computes the interval and will return `None` if a
     /// overflow has occured.
     pub fn checked_add_year_month(self, year: i32, months: i32) -> Option<Interval> {
-        let years_as_months = year.checked_mul(12);
+        let years_as_months = year.checked_mul(12)?;
+        let additional_months = years_as_months.checked_add(months)?;
         Some(Interval {
-            months: self.months.checked_add(years_as_months)?.checked_add(months)?,
+            months: self.months.checked_add(additional_months)?,
             days: self.days,
             microseconds: self.microseconds
         })
     }
 
     /// Checked year month subtraction. Computes the interval and will return `None` if a
-    /// overflow/underflow has occured.
+    /// overflow has occured.
     pub fn checked_sub_year_month(self, year: i32, months: i32) -> Option<Interval> {
         let years_as_months = year.checked_mul(12)?;
         Some(Interval {
@@ -194,8 +196,6 @@ impl Interval {
             microseconds: self.microseconds
         })
     }
-
-
 }
 
 impl ops::Add for Interval {
