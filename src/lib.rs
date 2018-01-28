@@ -1,5 +1,6 @@
-mod iso_8601;
-mod postgres;
+mod interval_fmt;
+
+use interval_fmt::{iso_8601, postgres};
 use std::ops;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -29,7 +30,8 @@ impl Interval {
         self.days
     }
 
-    /// Get the amount of microseconds in the interval
+    /// Get the amount of microseconds in the interval. Acts as a container for hours,
+    /// minutes, seconds portion of the interval.
     pub fn microseconds(&self) -> i64 {
         self.microseconds
     }
@@ -76,6 +78,7 @@ impl Interval {
     pub fn checked_add(self, other_interval: Interval) -> Option<Interval> {
         Some(Interval {
             months: self.months.checked_add(other_interval.months)?,
+            pub fn checked_sub(self, other_interval: Interval) -> Option<Interval> {
             days: self.days.checked_add(other_interval.days)?,
             microseconds: self.microseconds.checked_add(other_interval.microseconds)?
         })
@@ -83,13 +86,115 @@ impl Interval {
 
     /// Checked interval subtraction. Computes `Interval - Interval` and `None` if there
     /// was an underflow.
-    pub fn checked_sub(self, other_interval: Interval) -> Option<Interval> {
         Some(Interval {
             months: self.months.checked_sub(other_interval.months)?,
             days: self.days.checked_sub(other_interval.days)?,
             microseconds: self.microseconds.checked_sub(other_interval.microseconds)?
         })
     }
+
+    /// Shortcut method to add day time part to the interval. Any units smaller than a microsecond
+    /// will be truncated.
+    pub fn  add_day_time(self, days: i32, hours: i64, minutes: i64, seconds: f64) -> Interval {
+            let hours_as_micro: i64 = hours *3600000000;
+            let minutes_as_micro: i64 = minutes * 60000000;
+            let seconds_as_micro: i64 = (seconds * 1000000.0) as i64;
+            let additional_micro: i64 = hours_as_micro + minutes_as_micro + seconds_as_micro;
+            Interval {
+                months: self.months,
+                days: self.days + days,
+                microseconds: self.microseconds + additional_micro
+            }
+    }
+
+    /// Shortcut method to subtract day time part to the interval. Any units smaller than
+    /// a microsecond will be truncated.
+    pub fn  sub_day_time(self, days: i32, hours: i64, minutes: i64, seconds: f64) -> Interval {
+            let hours_as_micro: i64 = hours *3600000000;
+            let minutes_as_micro: i64 = minutes * 60000000;
+            let seconds_as_micro: i64 = (seconds * 1000000.0) as i64;
+            let additional_micro: i64 = hours_as_micro + minutes_as_micro + seconds_as_micro;
+            Interval {
+                months: self.months,
+                days: self.days - days,
+                microseconds: self.microseconds - additional_micro
+            }
+    }
+
+    /// Checked day time interval addition. Computes the interval and will return `None` if a
+    /// overflow has occured. Any units smaller than a microsecond will be truncated.
+    pub fn checked_add_day_time(self, days: i32, hours: i64, minutes: i64, seconds: f64) -> Option<Interval> {
+            let hours_as_micro: i64 = hours.checked_mul(3600000000)?;
+            let minutes_as_micro: i64 = minutes.checked_mul(60000000)?;
+            let seconds_as_micro: i64 = (seconds.checked_mul(1000000)?) as i64;
+            let additional_micro: i64 = hours_as_micro.checked_add(minutes_as_micro)?
+                                                      .checked_add(seconds_as_micro)?;
+            Some(Interval {
+                months: self.months,
+                days: self.days.checked_add(days),
+                microseconds: self.microseconds.checked_add(additional_micro)?
+            })
+    }
+
+    /// Checked day time subtraction. Computes the interval and will return `None` if a
+    /// overflow/underflow has occured. Any units smaller than a microsecond will be truncated.
+    pub fn checked_sub_day_time(self, days: i32,  hours: i64, minutes: i64, seconds: f64) -> Option<Interval> {
+            let hours_as_micro: i64 = hours.checked_mul(3600000000)?;
+            let minutes_as_micro: i64 = minutes.checked_mul(60000000)?;
+            let seconds_as_micro: i64 = (seconds.checked_mul(1000000)?) as i64;
+            let subtracted_micro: i64 = hours_as_micro.checked_add(minutes_as_micro)?
+                                                      .checked_add(seconds_as_micro)?;
+            Some(Interval {
+                months: self.months,
+                days: self.days - days,
+                microseconds: self.microseconds.checked_sub(subtracted_micro)?
+            })
+    }
+
+
+    /// Adds a year month interval.
+    pub fn add_year_month(self, year: i32, months: i32) -> Interval {
+        let years_as_months = year * 12;
+        Interval {
+            months: self.months + years_as_months + months,
+            days: self.days,
+            microseconds: self.microseconds
+        }
+    }
+
+    /// Subtracts a year month interval.
+    pub fn sub_year_month(self, year: i32, months: i32) -> Interval {
+        let years_as_months = year * 12;
+        Interval {
+            months: self.months - years_as_months - months,
+            days: self.days,
+            microseconds: self.microseconds
+        }
+    }
+
+
+    /// Checked year month addition. Computes the interval and will return `None` if a
+    /// overflow has occured.
+    pub fn checked_add_year_month(self, year: i32, months: i32) -> Option<Interval> {
+        let years_as_months = year.checked_mul(12);
+        Some(Interval {
+            months: self.months.checked_add(years_as_months)?.checked_add(months)?,
+            days: self.days,
+            microseconds: self.microseconds
+        })
+    }
+
+    /// Checked year month subtraction. Computes the interval and will return `None` if a
+    /// overflow/underflow has occured.
+    pub fn checked_sub_year_month(self, year: i32, months: i32) -> Option<Interval> {
+        let years_as_months = year.checked_mul(12)?;
+        Some(Interval {
+            months: self.months.checked_sub(years_as_months)?.checked_sub(months)?,
+            days: self.days,
+            microseconds: self.microseconds
+        })
+    }
+
 
 }
 
@@ -138,7 +243,7 @@ fn get_minutes(current_microseconds: i64) -> (i64, i64) {
 
 // Helper function to derive the amount of seconds are found in the interval.
 fn get_seconds(current_microseconds: i64) -> f64 {
-  current_microseconds as f64 / 1000000 as f64
+  current_microseconds as f64 / 1000000.0
 }
 
 
