@@ -147,7 +147,7 @@ impl Interval {
                                                       .checked_add(seconds_as_micro)?;
             Some(Interval {
                 months: self.months,
-                days: self.days - days,
+                days: self.days.checked_sub(days)?,
                 microseconds: self.microseconds.checked_sub(subtracted_micro)?
             })
     }
