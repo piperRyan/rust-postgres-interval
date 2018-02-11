@@ -248,3 +248,79 @@ fn test_postgres_18() {
     let output = interval.to_postgres();
     assert_eq!(String::from("-01:10:15"), output);
 }
+
+#[test]
+fn test_checked_add() {
+    let interval = Interval::new(13,0,0);
+    let interval_add = Interval::new(2,1,12);
+    let result = interval.checked_add(interval_add);
+    assert_eq!(result, Some(Interval::new(15,1,12)));
+}
+
+#[test]
+fn test_checked_add_2() {
+    let interval = Interval::new(13,0,0);
+    let interval_add = Interval::new(i32::max_value(), 1, 12);
+    let result = interval.checked_add(interval_add);
+    assert_eq!(result, None);
+}
+
+#[test]
+fn test_checked_sub() {
+    let interval = Interval::new(13,0,0);
+    let interval_sub = Interval::new(2,0,0);
+    let result = interval.checked_sub(interval_sub);
+    assert_eq!(result, Some(Interval::new(11,0,0)));
+}
+
+#[test]
+fn test_checked_sub_2() {
+    let interval = Interval::new(-10,0,0);
+    let interval_sub = Interval::new(i32::max_value(), 0, 0);
+    let result = interval.checked_sub(interval_sub);
+    assert_eq!(result, None);
+}
+
+#[test]
+fn test_add_day_time() {
+    let interval = Interval::new(13,0,0);
+    let result = interval.add_day_time(2,0,0, 2.123456789);
+    assert_eq!(result, Interval::new(13,2,2123456));
+}
+
+#[test]
+fn test_sub_day_time() {
+    let interval = Interval::new(13,0,0);
+    let result = interval.sub_day_time(2,0,0, 2.12);
+    assert_eq!(result, Interval::new(13,-2,-2120000));
+}
+
+#[test]
+fn test_checked_add_day_time() {
+    let interval = Interval::new(13,0,0);
+    let result = interval.checked_add_day_time(2,0,0, 2.123456789);
+    assert_eq!(result, Some(Interval::new(13,2,2123456)));
+}
+
+#[test]
+fn test_checked_add_day_time_2() {
+    let interval = Interval::new(13,i32::max_value(),0);
+    let result = interval.checked_add_day_time(200,0,0, 2.123456789);
+    assert_eq!(result, None);
+}
+
+#[test]
+fn test_checked_sub_day_time() {
+    let interval = Interval::new(13,0,0);
+    let result = interval.checked_sub_day_time(2,0,0, 2.12);
+    assert_eq!(result, Some(Interval::new(13,-2,-2120000)));
+}
+
+#[test]
+fn test_checked_sub_day_time_2() {
+    let interval = Interval::new(13,i32::min_value(),0);
+    println!("{:?}", interval.days());
+    let result = interval.checked_sub_day_time(100,0,0, 2.12);
+    println!("{:?}", result);
+    assert_eq!(result, None);
+}
