@@ -324,3 +324,45 @@ fn test_checked_sub_day_time_2() {
     println!("{:?}", result);
     assert_eq!(result, None);
 }
+
+#[test]
+fn test_add_year_month() {
+    let interval = Interval::new(13,0,0);
+    let result = interval.add_year_month(1,1);
+    assert_eq!(result, Interval::new(26,0,0));
+}
+
+#[test]
+fn test_sub_year_month() {
+    let interval = Interval::new(13,0,0);
+    let result = interval.sub_year_month(1,1);
+    assert_eq!(result, Interval::new(0,0,0));
+}
+
+#[test]
+fn checked_add_year_month_1() {
+    let interval = Interval::new(15,0,0);
+    let result = interval.checked_add_year_month(1,1);
+    assert_eq!(result, Some(Interval::new(28,0,0)));
+}
+
+#[test]
+fn checked_add_year_month_2() {
+    let interval = Interval::new(15,0,0);
+    let result = interval.checked_add_year_month(i32::max_value(),32);
+    assert_eq!(result, None);
+}
+
+#[test]
+fn test_checked_sub_year_month_1() {
+    let interval = Interval::new(13,0,0);
+    let result = interval.checked_sub_year_month(1,1);
+    assert_eq!(result, Some(Interval::new(0,0,0)));
+}
+
+#[test]
+fn test_checked_sub_year_month_2() {
+    let interval = Interval::new(-20,0,0);
+    let result = interval.checked_sub_year_month(i32::min_value(),1);
+    assert_eq!(result, None);
+}
