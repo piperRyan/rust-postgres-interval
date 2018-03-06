@@ -316,7 +316,7 @@ fn test_checked_sub_day_time() {
 #[test]
 fn test_checked_sub_day_time_2() {
     let interval = Interval::new(13, i32::min_value(), 0);
-    println!("{:?}", interval.days());
+    println!("{:?}", interval.days);
     let result = interval.checked_sub_day_time(100, 0, 0, 2.12);
     println!("{:?}", result);
     assert_eq!(result, None);
