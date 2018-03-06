@@ -373,24 +373,24 @@ mod tests {
     #[test]
     fn test_new_interval_pos() {
         let interval = Interval::new(1, 1, 30);
-        assert_eq!(interval.months(), 1);
-        assert_eq!(interval.days(), 1);
-        assert_eq!(interval.microseconds(), 30);
+        assert_eq!(interval.months, 1);
+        assert_eq!(interval.days, 1);
+        assert_eq!(interval.microseconds, 30);
     }
 
     #[test]
     fn test_new_interval_neg() {
         let interval = Interval::new(-1, -1, -30);
-        assert_eq!(interval.months(), -1);
-        assert_eq!(interval.days(), -1);
-        assert_eq!(interval.microseconds(), -30);
+        assert_eq!(interval.months, -1);
+        assert_eq!(interval.days, -1);
+        assert_eq!(interval.microseconds, -30);
     }
 
     #[test]
     fn test_clone() {
         let interval = Interval::new(1,1,30);
-        test_interval = interval_test.clone();
-        assert_eq!(interval, interval_test);
+        let test_interval = interval.clone();
+        assert_eq!(interval, test_interval);
     }
 
     #[test]
