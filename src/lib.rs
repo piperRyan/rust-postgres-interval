@@ -5,9 +5,9 @@ use std::ops;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Interval {
-    months: i32,
-    days: i32,
-    microseconds: i64,
+    pub months: i32,
+    pub days: i32,
+    pub microseconds: i64,
 }
 
 impl Interval {
@@ -18,22 +18,6 @@ impl Interval {
             days: days,
             microseconds: microseconds,
         }
-    }
-
-    /// Get the amount of months in the interval.
-    pub fn months(&self) -> i32 {
-        self.months
-    }
-
-    /// Get the amount of days in the interval.
-    pub fn days(&self) -> i32 {
-        self.days
-    }
-
-    /// Get the amount of microseconds in the interval. Acts as a container for hours,
-    /// minutes, seconds portion of the interval.
-    pub fn microseconds(&self) -> i64 {
-        self.microseconds
     }
 
     /// Output the interval as iso 8601 compliant string.
@@ -400,5 +384,19 @@ mod tests {
         assert_eq!(interval.months(), -1);
         assert_eq!(interval.days(), -1);
         assert_eq!(interval.microseconds(), -30);
+    }
+
+    #[test]
+    fn test_clone() {
+        let interval = Interval::new(1,1,30);
+        test_interval = interval_test.clone();
+        assert_eq!(interval, interval_test);
+    }
+
+    #[test]
+    fn test_equality() {
+        let interval = Interval::new(1,1,30);
+        let different_interval = Interval::new(1,3,3);
+        assert!(interval != different_interval);
     }
 }
