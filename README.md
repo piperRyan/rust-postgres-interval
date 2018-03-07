@@ -5,6 +5,10 @@
 # Rust-Postgres-Interval
 A interval type for the postgres driver.
 
+# Contributing
+
+There is a separate document on how to contribute to this repo [here](CONTRIBUTING.md)
+
 ## Overview
 Rust-Postgres-Interval is dedicated datatype for the postgres interval type.
 
