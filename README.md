@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/piperRyan/rust-postgres-interval.svg?branch=master)](https://travis-ci.org/piperRyan/rust-postgres-interval)
-
-[![codecov](https://codecov.io/gh/piperRyan/rust-postgres-interval/branch/master/graph/badge.svg)](https://codecov.io/gh/piperRyan/rust-postgres-interval)
+[![Build Status](https://travis-ci.org/piperRyan/rust-postgres-interval.svg?branch=master)](https://travis-ci.org/piperRyan/rust-postgres-interval) [![codecov](https://codecov.io/gh/piperRyan/rust-postgres-interval/branch/master/graph/badge.svg)](https://codecov.io/gh/piperRyan/rust-postgres-interval)
 
 # Rust-Postgres-Interval
 A interval type for the postgres driver.
@@ -36,4 +34,4 @@ fn main() {
 - [ ] Parse iso 8601, postgre, and sql interval strings into interval
 - [ ] Support for nightly and beta
 - [ ] Poll community to better define use cases
-- [ ] Basic chrono integration 
+- [ ] Basic chrono integration
