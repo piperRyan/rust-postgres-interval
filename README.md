@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/piperRyan/rust-postgres-interval.svg?branch=master)](https://travis-ci.org/piperRyan/rust-postgres-interval)
+
+[![codecov](https://codecov.io/gh/piperRyan/rust-postgres-interval/branch/master/graph/badge.svg)](https://codecov.io/gh/piperRyan/rust-postgres-interval)
+
 # Rust-Postgres-Interval
 A interval type for the postgres driver.
 
