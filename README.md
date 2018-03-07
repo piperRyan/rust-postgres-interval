@@ -29,3 +29,11 @@ fn main() {
 
 ## Requirements
 - rust 1.22
+
+## Roadmap to 1.0.0
+
+- [ ] Implement method to covert interval into a sql compliant interval string
+- [ ] Parse iso 8601, postgre, and sql interval strings into interval
+- [ ] Support for nightly and beta
+- [ ] Poll community to better define use cases
+- [ ] Basic chrono integration 
