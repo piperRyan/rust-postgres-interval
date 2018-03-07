@@ -21,10 +21,10 @@ Before submitting you merge request(s) please review the following guidelines:
 * Implement you changes and include appropriate test cases.
 * Please follow our coding rules as indicated above.
 * If necessary please add any relevant documentation.
-* Before pushing you branch upstream rebase your branch onto development:
+* Before pushing you branch upstream rebase your branch onto master:
 
 ```bash
-git pull --rebase origin development
+git pull --rebase origin master
 ```
 
 * If we suggest any changes commit your changes to you branch and push upstream.
@@ -48,8 +48,6 @@ git push origin <mybranch> -f
 ```
 git branch -d <mybranch>
 ```
-
-* Please make any pull request against development.
 
 ## <a name="commits"></a> Git Commit Guidelines
 
