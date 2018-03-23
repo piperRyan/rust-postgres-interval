@@ -11,9 +11,9 @@ There is a separate document on how to contribute to this repo [here](CONTRIBUTI
 Rust-Postgres-Interval is dedicated datatype for the postgres interval type.
 
 ```rust
-extern crate postgres_interval;
+extern crate pg_interval;
 
-use postgres_interval::Interval;
+use pg_interval::Interval;
 
 fn main() {
     let months = 13;
