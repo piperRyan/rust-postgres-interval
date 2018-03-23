@@ -200,7 +200,7 @@ impl ops::Add for Interval {
     fn add(self, other_interval: Interval) -> Interval {
         Interval {
             months: self.months + other_interval.months,
-            days: self.days + other_interval.months,
+            days: self.days + other_interval.days,
             microseconds: self.microseconds + other_interval.microseconds,
         }
     }
@@ -765,8 +765,8 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let interval = Interval::new(-20, 0,0);
-        let other_interval = Interval(30, 0, 0);
+        let interval = Interval::new(0, 0,0);
+        let other_interval = Interval::new(10, 0, 0);
         let result = interval + other_interval;
         assert_eq!(result, Interval::new(10,0,0));
     }
@@ -774,8 +774,8 @@ mod tests {
     #[test]
     fn test_sub() {
         let interval = Interval::new(30, 0,0);
-        let other_interval = Interval(20, 0, 0);
-        let result = interval + other_interval;
+        let other_interval = Interval::new(20, 0, 0);
+        let result = interval - other_interval;
         assert_eq!(result, Interval::new(10,0,0));
     }
 
