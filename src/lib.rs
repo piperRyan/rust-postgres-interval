@@ -763,4 +763,20 @@ mod tests {
         assert_eq!(result, None);
     }
 
+    #[test]
+    fn test_add() {
+        let interval = Interval::new(-20, 0,0);
+        let other_interval = Interval(30, 0, 0);
+        let result = interval + other_interval;
+        assert_eq!(result, Interval::new(10,0,0));
+    }
+
+    #[test]
+    fn test_sub() {
+        let interval = Interval::new(30, 0,0);
+        let other_interval = Interval(20, 0, 0);
+        let result = interval + other_interval;
+        assert_eq!(result, Interval::new(10,0,0));
+    }
+
 }
