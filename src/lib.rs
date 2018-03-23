@@ -41,19 +41,19 @@ impl Interval {
     pub fn to_postgres(&self) -> String {
         let (years, months) = get_years_months(self.months);
         let days = self.days;
-        let year_months_interval = pg::get_year_month_interval(years, months, days);
+        let year_months_interval = postgre_style::get_year_month_interval(years, months, days);
         let (remaining_microseconds, hours) = get_hours(self.microseconds);
         let (remaining_microseconds, minutes) = get_minutes(remaining_microseconds);
         let seconds = get_seconds(remaining_microseconds);
         if self.microseconds != 0 && year_months_interval.is_some() {
             let mut ym_interval = year_months_interval.unwrap();
-            let day_time_interval = pg::get_day_time_interval(hours, minutes, seconds);
+            let day_time_interval = postgre_style::get_day_time_interval(hours, minutes, seconds);
             ym_interval = ym_interval + " " + &*day_time_interval;
             ym_interval
         } else if year_months_interval.is_some() && self.microseconds == 0 {
             year_months_interval.unwrap()
         } else {
-            pg::get_day_time_interval(hours, minutes, seconds)
+            postgre_style::get_day_time_interval(hours, minutes, seconds)
         }
     }
 
