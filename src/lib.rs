@@ -1,6 +1,6 @@
 mod interval_fmt;
 
-use interval_fmt::{postgre_style, iso_8601};
+use interval_fmt::{postgre_style, iso_8601, sql};
 use std::ops;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -55,6 +55,16 @@ impl Interval {
         } else {
             postgre_style::get_day_time_interval(hours, minutes, seconds)
         }
+    }
+
+    ///Output the interval as a sql compliant interval string. 
+    pub fn to_sql(&self) -> String {
+        let (years, months) = get_years_months(self.months); 
+        let days = self.days; 
+        let (remaining_microseconds, hours) = get_hours(self.microseconds); 
+        let (remaining_microseconds, minutes) = get_minutes(remaining_microseconds); 
+        let seconds = get_seconds(remaining_microseconds);
+        sql::fmt_to_sql_standard(years, months, days, hours, minutes, seconds)
     }
 
     /// Checked interval addition. Computes `Interval + Interval` and `None` if there
