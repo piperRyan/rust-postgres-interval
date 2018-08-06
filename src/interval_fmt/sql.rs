@@ -55,13 +55,21 @@ pub fn fmt_to_sql_standard(years: i32,
         } else {
             time_sign = "";
         }
+        let seconds_abs = seconds.abs(); 
+        let seconds_fmt = {
+            if seconds_abs >= 10.0 { 
+                format!("{}", seconds_abs)
+            } else {
+                format!("0{}", seconds_abs)
+            }
+        };
         format!("+0-0 {}{} {}{:01}:{:02}:{:02}",
                  day_sign,
                  safe_abs_u32(days),
                  time_sign,
                  hours.abs(),
                  months.abs(),
-                 seconds.abs())
+                 &*seconds_fmt)
     } else if !has_year_month_time && has_time && !has_day {
         let time_sign; 
         if hours < 0 || minutes < 0 || seconds < 0.0 {
@@ -69,7 +77,15 @@ pub fn fmt_to_sql_standard(years: i32,
         } else {
             time_sign = "";
         }
-        format!("{}{:01}:{:02}:{:02}", time_sign, hours.abs(), minutes.abs(), seconds.abs())
+        let seconds_abs = seconds.abs(); 
+        let seconds_fmt = {
+            if seconds_abs >= 10.0 { 
+                format!("{}", seconds_abs)
+            } else {
+                format!("0{}", seconds_abs)
+            }
+        };
+        format!("{}{:01}:{:02}:{:02}", time_sign, hours.abs(), minutes.abs(), seconds_fmt)
     } else if !has_year_month_time && !has_time && has_day {
          let day_sign; 
         if days < 0 {
@@ -222,6 +238,14 @@ mod tests {
     fn it_should_format_day_only_year_month() {
         let actual_result = super::fmt_to_sql_standard(1,0,0,0,0,0.0);
         let expected_result = "1-0".to_owned();
+        println!("{}", actual_result); 
+        assert_eq!(actual_result, expected_result);
+    }
+
+    #[test]
+    fn it_should_format_just_time() {
+        let actual_result = super::fmt_to_sql_standard(0,0,0,0,0,1.23);
+        let expected_result = "0:00:01.23".to_owned();
         println!("{}", actual_result); 
         assert_eq!(actual_result, expected_result);
     }
