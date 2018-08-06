@@ -7,7 +7,7 @@ description = "A native PostgreSQL interval type"
 repository = "https://github.com/piperRyan/rust-postgres-interval"
 readme = "../README.md"
 keywords = ["database", "postgres", "postgresql", "sql", "interval"]
-include = ["src/*", "Cargo.toml", "LICENSE", "README.md", "THIRD_PARTY"]
+include = ["src/*", "Cargo.toml", "LICENSE", "README.md"]
 categories = ["Date and time"]
 
 [features]
