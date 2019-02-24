@@ -1,4 +1,5 @@
 use pg_interval::Interval;
+use std::ops::Neg;
 
 pub struct IntervalNorm {
     pub years: i32,
@@ -21,15 +22,15 @@ impl<'a> From<&'a Interval> for IntervalNorm {
         let months = months - years * 12;
         // calc the hours from the microseconds and update
         // the remaining microseconds.
-        let hours = (microseconds - (microseconds % 3600000000)) / 3600000000;
-        let microseconds = microseconds - hours * 3600000000;
+        let hours = (microseconds - (microseconds % 3_600_000_000)) / 3_600_000_000;
+        let microseconds = microseconds - hours * 3_600_000_000;
         // calc the minutes from remaining microseconds and
         // update the remaining microseconds.
-        let minutes = (microseconds - (microseconds % 60000000)) / 60000000;
-        let microseconds = microseconds - minutes * 60000000;
+        let minutes = (microseconds - (microseconds % 60_000_000)) / 60_000_000;
+        let microseconds = microseconds - minutes * 60_000_000;
         // calc the seconds and update the remaining microseconds.
-        let seconds = (microseconds - (microseconds % 1000000)) / 1000000;
-        let microseconds = microseconds - seconds * 1000000;
+        let seconds = (microseconds - (microseconds % 1_000_000)) / 1_000_000;
+        let microseconds = microseconds - seconds * 1_000_000;
         IntervalNorm {
             years,
             months,
@@ -45,22 +46,22 @@ impl<'a> From<&'a Interval> for IntervalNorm {
 impl IntervalNorm {
     /// Is all the values in the interval set to 0?
     fn is_zeroed(&self) -> bool {
-        return self.years == 0
+           self.years == 0
             && self.months == 0
             && self.hours == 0
             && self.minutes == 0
             && self.seconds == 0
-            && self.microseconds == 0;
+            && self.microseconds == 0
     }
 
     /// Is the years or month value set?
     fn is_year_month_present(&self) -> bool {
-        return self.years != 0 || self.months != 0;
+        self.years != 0 || self.months != 0
     }
 
     /// Is the day value set?
     fn is_day_present(&self) -> bool {
-        return self.days != 0;
+        self.days != 0
     }
 
     /// Is at least one of hours,minutes,seconds,microseconds values
@@ -81,10 +82,11 @@ impl IntervalNorm {
     fn get_sql_postgres_time_interval(&self) -> String {
         let mut time_interval = "".to_owned();
         if self.is_time_present() {
-            let mut sign = "".to_owned();
-            if !self.is_time_interval_pos() {
-                sign = "-".to_owned();
-            }
+            let sign = if !self.is_time_interval_pos() {
+                "-".to_owned()
+            } else {
+                "".to_owned()
+            };
             time_interval.push_str(
                 &*(sign
                     + &pad_i64(self.hours)
@@ -101,7 +103,7 @@ impl IntervalNorm {
     }
 
     /// Produces a iso 8601 compliant interval string.
-    pub fn to_iso_8601(self) -> String {
+    pub fn into_iso_8601(self) -> String {
         if self.is_zeroed() {
             return "PT0S".to_owned();
         }
@@ -137,11 +139,11 @@ impl IntervalNorm {
         }
         year_interval.push_str(&*day_interval);
         year_interval.push_str(&*time_interval);
-        return year_interval;
+        year_interval
     }
 
     /// Produces a postgres compliant interval string.
-    pub fn to_postgres(self) -> String {
+    pub fn into_postgres(self) -> String {
         if self.is_zeroed() {
             return "00:00:00".to_owned();
         }
@@ -165,7 +167,7 @@ impl IntervalNorm {
     }
 
     /// Produces a compliant sql interval string.
-    pub fn to_sql(self) -> String {
+    pub fn into_sql(self) -> String {
         if self.is_zeroed() {
             return "0".to_owned();
         }
@@ -179,15 +181,16 @@ impl IntervalNorm {
             day_interval = format!("{:#?} ", self.days);
         }
         if self.is_year_month_present() {
-            let mut sign = "+".to_owned();
-            if self.years < 0 || self.months < 0 {
-                sign = "-".to_owned();
-            }
+            let sign = if self.years < 0 || self.months < 0 {
+                "-".to_owned()
+            } else {
+                "+".to_owned()
+            };
             year_interval = format!("{}{}-{} ", sign, self.years, self.months);
         }
         year_interval.push_str(&day_interval);
         year_interval.push_str(&time_interval);
-        return year_interval.trim().to_owned();
+        year_interval.trim().to_owned()
     }
 }
 
@@ -195,13 +198,12 @@ impl IntervalNorm {
 /// without any overflow issues.
 fn safe_abs_u64(mut num: i64) -> u64 {
     let max = i64::max_value();
-    let max_min = max * -1;
+    let max_min = max.neg();
     if num <= max_min {
         let result = max as u64;
         num += max;
-        num = num * -1;
-        let result = result + num as u64;
-        result
+        num *= -1;
+        result + num as u64
     } else {
         num.abs() as u64
     }
@@ -209,11 +211,10 @@ fn safe_abs_u64(mut num: i64) -> u64 {
 
 /// Pads a i64 value with a width of 2.
 fn pad_i64(val: i64) -> String {
-    let num;
-    if val < 0 {
-        num = safe_abs_u64(val);
+    let num = if val < 0 {
+        safe_abs_u64(val)
     } else {
-        num = val as u64;
-    }
+        val as u64
+    };
     return format!("{:02}", num);
 }
