@@ -15,9 +15,9 @@ impl Interval {
     /// Shortcut method to subtract day time part to the interval. Any units smaller than
     /// a microsecond will be truncated.
     pub fn sub_day_time(self, days: i32, hours: i64, minutes: i64, seconds: f64) -> Interval {
-        let hours_as_micro: i64 = hours * 3600000000;
-        let minutes_as_micro: i64 = minutes * 60000000;
-        let seconds_as_micro: i64 = (seconds * 1000000.0).floor() as i64;
+        let hours_as_micro: i64 = hours * 3_600_000_000;
+        let minutes_as_micro: i64 = minutes * 60_000_000;
+        let seconds_as_micro: i64 = (seconds * 1_000_000.0).floor() as i64;
         let additional_micro: i64 = hours_as_micro + minutes_as_micro + seconds_as_micro;
         Interval {
             months: self.months,
@@ -35,9 +35,9 @@ impl Interval {
         minutes: i64,
         seconds: f64,
     ) -> Option<Interval> {
-        let hours_as_micro: i64 = hours.checked_mul(3600000000)?;
-        let minutes_as_micro: i64 = minutes.checked_mul(60000000)?;
-        let seconds_as_micro: i64 = (seconds * 1000000.0).floor() as i64;
+        let hours_as_micro: i64 = hours.checked_mul(3_600_000_000)?;
+        let minutes_as_micro: i64 = minutes.checked_mul(60_000_000)?;
+        let seconds_as_micro: i64 = (seconds * 1_000_000.0).floor() as i64;
         let subtracted_micro: i64 = hours_as_micro
             .checked_add(minutes_as_micro)?
             .checked_add(seconds_as_micro)?;

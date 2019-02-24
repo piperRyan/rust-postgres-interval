@@ -11,25 +11,25 @@ impl Interval {
     /// Create a new instance of interval from the months, days, and microseconds.
     pub fn new(months: i32, days: i32, microseconds: i64) -> Interval {
         Interval {
-            months: months,
-            days: days,
-            microseconds: microseconds,
+            months,
+            days,
+            microseconds,
         }
     }
 
     /// Output the interval as iso 8601 compliant string.
     pub fn to_iso_8601(&self) -> String {
-        IntervalNorm::from(self).to_iso_8601()
+        IntervalNorm::from(self).into_iso_8601()
     }
 
     /// Output the interval as a postgres interval string.
     pub fn to_postgres(&self) -> String {
-        IntervalNorm::from(self).to_postgres()
+        IntervalNorm::from(self).into_postgres()
     }
 
     ///Output the interval as a sql compliant interval string.
     pub fn to_sql(&self) -> String {
-        IntervalNorm::from(self).to_sql()
+        IntervalNorm::from(self).into_sql()
     }
 }
 
