@@ -340,7 +340,6 @@ mod tests {
         assert_eq!(String::from("+1-1 +1 +1:00:00"), output);
     }
 
-    
     #[test]
     fn test_sql_5() {
         let interval = Interval::new(13, 1, 4200000000);
@@ -348,7 +347,6 @@ mod tests {
         assert_eq!(String::from("+1-1 +1 +1:10:00"), output);
     }
 
-    
     #[test]
     fn test_sql_6() {
         let interval = Interval::new(13, 1, 4215000000);
@@ -363,7 +361,6 @@ mod tests {
         assert_eq!(String::from("1:00:00"), output);
     }
 
-    
     #[test]
     fn test_sql_8() {
         let interval = Interval::new(0, 0, 4200000000);
@@ -371,7 +368,6 @@ mod tests {
         assert_eq!(String::from("1:10:00"), output);
     }
 
-    
     #[test]
     fn test_sql_9() {
         let interval = Interval::new(0, 0, 4215000000);
@@ -379,14 +375,13 @@ mod tests {
         assert_eq!(String::from("1:10:15"), output);
     }
 
-    
     #[test]
     fn test_sql_10() {
         let interval = Interval::new(-12, 0, 0);
         let output = interval.to_sql();
         assert_eq!(String::from("-1-0"), output);
     }
-    
+
     #[test]
     fn test_sql_11() {
         let interval = Interval::new(-13, 0, 0);
@@ -394,7 +389,6 @@ mod tests {
         assert_eq!(String::from("-1-1"), output);
     }
 
-    
     #[test]
     fn test_sql_12() {
         let interval = Interval::new(-13, -1, 0);
@@ -402,7 +396,6 @@ mod tests {
         assert_eq!(String::from("-1-1 -1 +0:00:00"), output);
     }
 
-    
     #[test]
     fn test_sql_13() {
         let interval = Interval::new(-13, -1, -3600000000);
@@ -416,8 +409,7 @@ mod tests {
         let output = interval.to_sql();
         assert_eq!(String::from("-1-1 -1 -1:10:00"), output);
     }
-    
-    
+
     #[test]
     fn test_sql_15() {
         let interval = Interval::new(-13, -1, -4215000000);
@@ -425,7 +417,6 @@ mod tests {
         assert_eq!(String::from("-1-1 -1 -1:10:15"), output);
     }
 
-    
     #[test]
     fn test_sql_16() {
         let interval = Interval::new(0, 0, -3600000000);
@@ -433,7 +424,6 @@ mod tests {
         assert_eq!(String::from("-1:00:00"), output);
     }
 
-    
     #[test]
     fn test_sql_17() {
         let interval = Interval::new(0, 0, -4200000000);
@@ -441,7 +431,6 @@ mod tests {
         assert_eq!(String::from("-1:10:00"), output);
     }
 
-    
     #[test]
     fn test_sql_18() {
         let interval = Interval::new(0, 0, -4215000000);
