@@ -7,9 +7,9 @@ extern crate byteorder;
 #[cfg(feature = "postgres")]
 mod integrations;
 
-mod pg_formatter;
+mod interval_fmt;
+mod interval_norm;
 mod pg_interval;
 mod pg_interval_add;
 mod pg_interval_sub;
-
 pub use pg_interval::Interval;
