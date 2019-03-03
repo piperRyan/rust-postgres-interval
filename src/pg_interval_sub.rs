@@ -86,7 +86,7 @@ impl ops::Sub for Interval {
 
 #[cfg(test)]
 mod tests {
-        use pg_interval::Interval;
+    use pg_interval::Interval;
 
     #[test]
     fn test_sub_day_time() {
