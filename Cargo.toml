@@ -16,3 +16,5 @@ default = ["postgres"]
 [dependencies]
 postgres = { version = "^0.15", optional=true }
 byteorder = { version = "1.2.4" }
+regex = "1"
+lazy_static = "1.3"
