@@ -3,6 +3,9 @@
 extern crate postgres;
 #[cfg(feature = "postgres")]
 extern crate byteorder;
+extern crate regex;
+#[macro_use] 
+extern crate lazy_static;
 
 #[cfg(feature = "postgres")]
 mod integrations;
