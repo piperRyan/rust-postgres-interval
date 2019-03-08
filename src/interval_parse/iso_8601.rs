@@ -3,7 +3,7 @@ use pg_interval::PgInterval;
 impl PgInterval {
     pub fn from_iso<T: Into<String>>(iso_str: T) -> PgInterval {
         lazy_static!{
-            static ref RE: Regex = Regex::new("P(?:(\d+?Y)?(\d+?M)?(\d+?D)?(?:T(\d+?H)?(\d+?M)?(\d+(?:[\.,]\d{0,6})?S)?)?)$").unwrap();
+            static ref RE: Regex = Regex::new("P(?:(-?\d+?Y)?(-?\d+?M)?(-?\d+?D)?(?:T(-?\d+?H)?(-?\d+?M)?(-?\d+(?:[\.,]\d{0,6})?S)?)?)$").unwrap();
         }
         for interval in RE.captures_iter(iso_str.into()) {
             let year = caps.get(1).unwrap_or("0").as_str();
