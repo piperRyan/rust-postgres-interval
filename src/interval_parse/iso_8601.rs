@@ -145,129 +145,134 @@ mod tests {
     use pg_interval::Interval;
     
      #[test]
-    fn test_iso_1() {
+    fn test_from_iso_1() {
         let interval = Interval::from_iso("P1Y").unwrap();
         let interval_exp = Interval::new(12, 0, 0);
         assert_eq!(interval, interval_exp);
     }
 
-/*
+
     #[test]
-    fn test_8601_2() {
-        let interval = Interval::new(13, 0, 0);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P1Y1M"), output);
+    fn test_from_8601_2() {
+        let interval = Interval::from_iso("P1Y1M").unwrap();
+        let interval_exp = Interval::new(13, 0, 0);
+        assert_eq!(interval, interval_exp);
+    }
+
+
+    #[test]
+    fn test_from_8601_3() {
+        let interval = Interval::from_iso("P1Y1M1D").unwrap();
+        let interval_exp = Interval::new(13, 1, 0);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_3() {
-        let interval = Interval::new(13, 1, 0);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P1Y1M1D"), output);
+    fn test_from_8601_4() {
+         let interval = Interval::from_iso("P1Y1M1DT1H").unwrap();
+        let interval_exp = Interval::new(13, 1, 3600000000);
+        assert_eq!(interval, interval_exp);
+    }
+
+
+    #[test]
+    fn test_from_8601_5() {
+        let interval = Interval::from_iso("P1Y1M1DT1H10M").unwrap();
+        let interval_exp = Interval::new(13, 1, 4200000000);
+        assert_eq!(interval, interval_exp);
+    }
+
+
+    #[test]
+    fn test_from_8601_6() {
+         let interval = Interval::from_iso("P1Y1M1DT1H10M15S").unwrap();
+        let interval_exp = Interval::new(13, 1, 4215000000);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_4() {
-        let interval = Interval::new(13, 1, 3600000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P1Y1M1DT1H"), output);
+    fn test_from_8601_7() {
+        let interval = Interval::from_iso("PT1H").unwrap();
+        let interval_exp = Interval::new(0, 0, 3600000000);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_5() {
-        let interval = Interval::new(13, 1, 4200000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P1Y1M1DT1H10M"), output);
+    fn test_from_8601_8() {
+        let interval = Interval::from_iso("PT1H10M").unwrap();
+        let interval_exp = Interval::new(0, 0, 4200000000);
+        assert_eq!(interval, interval_exp);
+    }
+
+
+    #[test]
+    fn test_from_8601_9() {
+        let interval = Interval::from_iso("PT1H10M15S").unwrap();
+        let interval_exp = Interval::new(0, 0, 4215000000);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_6() {
-        let interval = Interval::new(13, 1, 4215000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P1Y1M1DT1H10M15S"), output);
+    fn test_from_8601_10() {
+        let interval = Interval::from_iso("P-1Y").unwrap();
+        let interval_exp =  Interval::new(-12, 0, 0);
+        assert_eq!(interval, interval_exp);
+    }
+
+
+    #[test]
+    fn test_from_8601_11() {
+        let interval = Interval::from_iso("P-1Y-1M").unwrap();
+        let interval_exp =  Interval::new(-13, 0, 0);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_7() {
-        let interval = Interval::new(0, 0, 3600000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("PT1H"), output);
+    fn test_from_8601_12() {
+        let interval = Interval::from_iso("P-1Y-1M-1D").unwrap();
+        let interval_exp =  Interval::new(-13, -1, 0);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_8() {
-        let interval = Interval::new(0, 0, 4200000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("PT1H10M"), output);
+    fn test_from_8601_13() {
+        let interval = Interval::from_iso("P-1Y-1M-1DT-1H").unwrap();
+        let interval_exp =  Interval::new(-13, -1, -3600000000);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_9() {
-        let interval = Interval::new(0, 0, 4215000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("PT1H10M15S"), output);
+    fn test_from_8601_14() {
+         let interval = Interval::from_iso("P-1Y-1M-1DT-1H-10M").unwrap();
+        let interval_exp =  Interval::new(-13, -1, -4200000000);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_10() {
-        let interval = Interval::new(-12, 0, 0);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P-1Y"), output);
+    fn test_from_8601_15() {
+        let interval = Interval::from_iso("P-1Y-1M-1DT-1H-10M-15S").unwrap();
+        let interval_exp =  Interval::new(-13, -1, -4215000000);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_11() {
-        let interval = Interval::new(-13, 0, 0);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P-1Y-1M"), output);
+    fn test_from_8601_16() {
+        let interval = Interval::from_iso("PT-1H").unwrap();
+        let interval_exp =  Interval::new(0, 0, -3600000000);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_12() {
-        let interval = Interval::new(-13, -1, 0);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P-1Y-1M-1D"), output);
+    fn test_from_8601_17() {
+        let interval = Interval::from_iso("PT-1H-10M").unwrap();
+        let interval_exp =  Interval::new(0, 0, -4200000000);
+        assert_eq!(interval, interval_exp);
     }
 
     #[test]
-    fn test_8601_13() {
-        let interval = Interval::new(-13, -1, -3600000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P-1Y-1M-1DT-1H"), output);
-    }
-
-    #[test]
-    fn test_8601_14() {
-        let interval = Interval::new(-13, -1, -4200000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P-1Y-1M-1DT-1H-10M"), output);
-    }
-
-    #[test]
-    fn test_8601_15() {
-        let interval = Interval::new(-13, -1, -4215000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("P-1Y-1M-1DT-1H-10M-15S"), output);
-    }
-
-    #[test]
-    fn test_8601_16() {
-        let interval = Interval::new(0, 0, -3600000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("PT-1H"), output);
-    }
-
-    #[test]
-    fn test_8601_17() {
-        let interval = Interval::new(0, 0, -4200000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("PT-1H-10M"), output);
-    }
-
-    #[test]
-    fn test_8601_18() {
-        let interval = Interval::new(0, 0, -4215000000);
-        let output = interval.to_iso_8601();
-        assert_eq!(String::from("PT-1H-10M-15S"), output);
-    } */
+    fn test_from_8601_18() {
+        let interval = Interval::from_iso("PT-1H-10M-15S").unwrap();
+        let interval_exp =  Interval::new(0, 0, -4215000000);
+        assert_eq!(interval, interval_exp);
+    } 
 }
