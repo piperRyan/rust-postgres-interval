@@ -34,7 +34,7 @@ fn main() {
     - [x] Iso 8601
     - [x] Postgres
     - [x] Sql
-- [ ] Parse Formated Strings Into The Interval Typ
+- [ ] Parse Formated Strings Into The Interval Type
     - [x] Iso 8601
     - [ ] Postgres
     - [ ] Sql
