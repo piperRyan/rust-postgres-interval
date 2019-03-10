@@ -314,4 +314,18 @@ mod tests {
         assert_eq!(interval, interval_exp);
     } 
 
+    #[test]
+    fn test_from_8601_24() {
+        let interval = Interval::from_iso("PT1.2S").unwrap();
+         let interval_exp =  Interval::new(0, 0, 1_200_000);
+        assert_eq!(interval, interval_exp);
+    } 
+
+    #[test]
+    fn test_from_8601_25() {
+        let interval = Interval::from_iso("PT5S5S").unwrap();
+        let interval_exp =  Interval::new(0, 0, 10000000);
+        assert_eq!(interval, interval_exp);
+    } 
+
 }
