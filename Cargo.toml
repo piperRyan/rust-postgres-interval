@@ -1,6 +1,6 @@
 [package]
 name = "pg_interval"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Ryan Piper <piper.ryan235@gmail.com>"]
 license = "MIT"
 description = "A native PostgreSQL interval type"
