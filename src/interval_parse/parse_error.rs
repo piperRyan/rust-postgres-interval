@@ -1,6 +1,6 @@
 use std::num::{ParseIntError, ParseFloatError};
 
-#[derive(Debug)]    
+#[derive(Debug, PartialEq, Eq)]    
 pub enum ParseError {
     ParseIntErr(ParseIntError),
     ParseFloatErr(ParseFloatError),
@@ -33,5 +33,25 @@ impl From<ParseIntError> for ParseError {
 impl From<ParseFloatError> for ParseError {
     fn from(error: ParseFloatError) -> ParseError {
         ParseError::ParseFloatErr(error)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ParseError; 
+    #[test]
+    fn can_covert_from_parse_float_error() {
+        let float_err = "fake".parse::<f64>().unwrap_err(); 
+        let result = ParseError::from(float_err.clone());
+        let expected = ParseError::ParseFloatErr(float_err);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn can_covert_from_parse_int_error() {
+        let float_err = "fake".parse::<i32>().unwrap_err(); 
+        let result = ParseError::from(float_err.clone());
+        let expected = ParseError::ParseIntErr(float_err);
+        assert_eq!(result, expected);
     }
 }
