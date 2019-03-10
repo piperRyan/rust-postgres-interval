@@ -30,7 +30,12 @@ fn main() {
 
 ## Roadmap to 1.0.0
 
-- [x] Implement method to covert interval into a sql compliant interval string
-- [ ] Parse iso 8601, postgre, and sql interval strings into interval
-- [ ] Support for nightly and beta
-- [ ] Basic chrono integration
+- [x] Convert Interval Into Formated String
+    - [x] Iso 8601
+    - [x] Postgres
+    - [x] Sql
+- [ ] Parse Formated Strings Into The Interval Typ
+    - [x] Iso 8601
+    - [ ] Postgres
+    - [ ] Sql
+- [ ] Chrono Integrations
