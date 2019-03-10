@@ -31,7 +31,7 @@ impl Interval {
             if x == 'P' {
                 continue;
             } 
-            if x == 'T' {
+            if x == 'T' && date_part {
                 date_part = false;
                 continue;
             }
@@ -84,7 +84,11 @@ impl Interval {
                 }
             } 
         }
-        interval_norm.try_into_interval()
+        if number != "" {
+            Err(ParseError::from_invalid_interval("Invalid format could not parse whole interval."))
+        } else {
+            interval_norm.try_into_interval()
+        }
       }
     }
 }
@@ -124,7 +128,8 @@ fn scale_date(val: f64, scale: i32) -> (i32, i32) {
         return (val.trunc() as i32, 0)
     } else {
         // matches postgres implementation of just truncating.
-        let sub_value = (val.fract() * scale as f64) as i32;
+        println!("val: {}, adjusted: {} scale: {}", val, (val.fract() * scale as f64), val.fract());
+        let sub_value = (val.fract() * scale as f64).round() as i32;
         (val.trunc() as i32, sub_value)
     }
 }
@@ -134,7 +139,7 @@ fn scale_time(val: f64, scale: i32) -> (i64, i64) {
         return (val.trunc() as i64, 0)
     } else {
         // matches postgres implementation of just truncating.
-        let sub_value = (val.fract() * scale as f64) as i64;
+        let sub_value = (val.fract() * scale as f64).round() as i64;
         (val.trunc() as i64, sub_value)
     }
 } 
@@ -275,4 +280,38 @@ mod tests {
         let interval_exp =  Interval::new(0, 0, -4215000000);
         assert_eq!(interval, interval_exp);
     } 
+
+
+    #[test]
+    fn test_from_8601_19() {
+        let interval = Interval::from_iso("PTT");
+        assert_eq!(interval.is_err(), true);
+    } 
+
+    #[test]
+    fn test_from_8601_20() {
+        let interval = Interval::from_iso("PT-");
+        assert_eq!(interval.is_err(), true);
+    } 
+
+     #[test]
+    fn test_from_8601_21() {
+        let interval = Interval::from_iso("PT10");
+        assert_eq!(interval.is_err(), true);
+    } 
+
+    #[test]
+    fn test_from_8601_22() {
+        let interval = Interval::from_iso("P1.2YT0S").unwrap();
+         let interval_exp =  Interval::new(14, 0, 0);
+        assert_eq!(interval, interval_exp);
+    } 
+
+     #[test]
+    fn test_from_8601_23() {
+        let interval = Interval::from_iso("P1.2MT0S").unwrap();
+         let interval_exp =  Interval::new(1, 6, 0);
+        assert_eq!(interval, interval_exp);
+    } 
+
 }
