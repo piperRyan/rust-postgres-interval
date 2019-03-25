@@ -73,6 +73,9 @@ impl Interval {
                             interval_norm.minutes += minutes;
                         }, 
                         'S' => {
+                            if date_part {
+                                return Err(ParseError::from_invalid_interval("Cannot have S in date part."))
+                            }
                             let(seconds, microseconds) = scale_time(val, MICROS_PER_SECOND);
                             interval_norm.seconds += seconds; 
                             interval_norm.microseconds += microseconds; 
@@ -128,7 +131,6 @@ fn scale_date(val: f64, scale: i32) -> (i32, i32) {
         return (val.trunc() as i32, 0)
     } else {
         // matches postgres implementation of just truncating.
-        println!("val: {}, adjusted: {} scale: {}", val, (val.fract() * scale as f64), val.fract());
         let sub_value = (val.fract() * scale as f64).round() as i32;
         (val.trunc() as i32, sub_value)
     }
