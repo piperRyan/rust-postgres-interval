@@ -47,19 +47,19 @@ fn pad_i64(val: i64) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
-     #[test]
+
+    #[test]
     fn abs_safe_u32() {
         let min = i32::min_value();
-        let actual = safe_abs_u32(min); 
+        let actual = safe_abs_u32(min);
         let expected = 2147483648;
         assert_eq!(actual, expected);
     }
 
-      #[test]
+    #[test]
     fn abs_safe_u64() {
         let min = i64::min_value();
-        let actual = safe_abs_u64(min); 
+        let actual = safe_abs_u64(min);
         let expected = 9_223_372_036_854_775_808;
         assert_eq!(actual, expected);
     }

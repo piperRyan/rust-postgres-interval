@@ -1,5 +1,5 @@
-use pg_interval::Interval;
 use interval_parse::parse_error::ParseError;
+use pg_interval::Interval;
 
 pub struct IntervalNorm {
     pub years: i32,
@@ -45,19 +45,27 @@ impl<'a> From<&'a Interval> for IntervalNorm {
 
 impl IntervalNorm {
     pub fn try_into_interval(self) -> Result<Interval, ParseError> {
-        let months = self.years.checked_mul(12)
+        let months = self
+            .years
+            .checked_mul(12)
             .and_then(|years| self.months.checked_add(years));
-        let microseconds = self.hours.checked_mul(60)
+        let microseconds = self
+            .hours
+            .checked_mul(60)
             .and_then(|minutes| self.minutes.checked_add(minutes))
             .and_then(|minutes| minutes.checked_mul(60))
             .and_then(|seconds| self.seconds.checked_add(seconds))
             .and_then(|seconds| seconds.checked_mul(1_000_000))
             .and_then(|microseconds| self.microseconds.checked_add(microseconds));
         Ok(Interval {
-            months: months.ok_or(ParseError::from_year_month("Invalid year/month interval overflow detected."))?,
-            days: self.days, 
-            microseconds: microseconds.ok_or(ParseError::from_time("Invalid time interval overflow detected."))?
-        })      
+            months: months.ok_or(ParseError::from_year_month(
+                "Invalid year/month interval overflow detected.",
+            ))?,
+            days: self.days,
+            microseconds: microseconds.ok_or(ParseError::from_time(
+                "Invalid time interval overflow detected.",
+            ))?,
+        })
     }
 
     pub fn default() -> IntervalNorm {
