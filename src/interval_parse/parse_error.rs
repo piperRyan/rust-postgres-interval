@@ -1,14 +1,13 @@
-use std::num::{ParseIntError, ParseFloatError};
+use std::num::{ParseFloatError, ParseIntError};
 
-#[derive(Debug, PartialEq, Eq)]    
+#[derive(Debug, PartialEq, Eq)]
 pub enum ParseError {
     ParseIntErr(ParseIntError),
     ParseFloatErr(ParseFloatError),
     InvalidYearMonth(String),
     InvalidTime(String),
-    InvalidInterval(String)
+    InvalidInterval(String),
 }
-
 
 impl<'a> ParseError {
     pub fn from_year_month(message: &'a str) -> ParseError {
@@ -38,10 +37,10 @@ impl From<ParseFloatError> for ParseError {
 
 #[cfg(test)]
 mod tests {
-    use super::ParseError; 
+    use super::ParseError;
     #[test]
     fn can_covert_from_parse_float_error() {
-        let float_err = "fake".parse::<f64>().unwrap_err(); 
+        let float_err = "fake".parse::<f64>().unwrap_err();
         let result = ParseError::from(float_err.clone());
         let expected = ParseError::ParseFloatErr(float_err);
         assert_eq!(result, expected);
@@ -49,7 +48,7 @@ mod tests {
 
     #[test]
     fn can_covert_from_parse_int_error() {
-        let float_err = "fake".parse::<i32>().unwrap_err(); 
+        let float_err = "fake".parse::<i32>().unwrap_err();
         let result = ParseError::from(float_err.clone());
         let expected = ParseError::ParseIntErr(float_err);
         assert_eq!(result, expected);
