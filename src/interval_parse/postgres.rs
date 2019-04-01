@@ -146,14 +146,12 @@ fn consume_token<'a>(
                 Ok(())
             }
             _ => {
-                 Err(
-                    ParseError::from_invalid_interval("Invalid deliminator.")
-                 )
+                 unreachable!()
             }
         }
     } else {
         Err(
-            ParseError::from_invalid_interval("Invalid deliminator2")
+            ParseError::from_invalid_interval(&format!("Unknown or duplicate deliminator \"{}\"", delim))
         )
     }
 }
@@ -335,6 +333,8 @@ mod tests {
         assert_eq!(interval.is_err(), true);
     } 
 
+ 
+
     #[test]
     fn test_from_postgres_25() {
         let interval = Interval::from_postgres("- years");
@@ -366,6 +366,12 @@ mod tests {
         let interval = Interval::from_postgres("1.2 seconds").unwrap();
          let interval_exp =  Interval::new(0, 0, 1_200_000);
         assert_eq!(interval, interval_exp);
+    } 
+
+    #[test]
+    fn test_from_postgres_30() {
+        let interval = Interval::from_postgres("!");
+        assert_eq!(interval.is_err(), true);
     } 
 
 }
