@@ -16,10 +16,9 @@ extern crate pg_interval;
 use pg_interval::Interval;
 
 fn main() {
-    let months = 13;
-    let days = 1;
-    let microseconds = 3600000000;
-    let interval = Interval::new(months, days, microseconds);
+    let interval = Interval::from_postgres(
+        "1 years 1 months 1 days 1 hours"
+    ).unwrap();
     let output = interval.to_iso_8601();
     assert_eq!(String::from("P1Y1M1DT1H"), output);
 }
@@ -36,6 +35,6 @@ fn main() {
     - [x] Sql
 - [ ] Parse Formated Strings Into The Interval Type
     - [x] Iso 8601
-    - [ ] Postgres
+    - [x] Postgres
     - [ ] Sql
 - [ ] Chrono Integrations
