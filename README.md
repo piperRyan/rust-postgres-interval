@@ -37,4 +37,4 @@ fn main() {
     - [x] Iso 8601
     - [x] Postgres
     - [ ] Sql
-- [ ] Chrono Integrations
+- [x] Chrono Integrations
