@@ -1,4 +1,4 @@
-use interval_norm::IntervalNorm;
+use crate::interval_norm::IntervalNorm;
 
 impl IntervalNorm {
     /// Produces a iso 8601 compliant interval string.

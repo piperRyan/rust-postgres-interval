@@ -9,6 +9,7 @@ readme = "README.md"
 keywords = ["database", "postgres", "postgresql", "sql", "interval"]
 include = ["src/*", "Cargo.toml", "LICENSE", "README.md"]
 categories = ["date-and-time"]
+edition = "2018"
 
 [features]
 default = ["postgres"]

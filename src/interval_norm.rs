@@ -1,5 +1,5 @@
-use interval_parse::parse_error::ParseError;
-use pg_interval::Interval;
+use crate::interval_parse::parse_error::ParseError;
+use crate::pg_interval::Interval;
 
 pub struct IntervalNorm {
     pub years: i32,

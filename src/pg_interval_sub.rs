@@ -1,5 +1,6 @@
-use pg_interval::Interval;
 use std::ops;
+
+use crate::pg_interval::Interval;
 
 impl Interval {
     /// Checked interval subtraction. Computes `Interval - Interval` and `None` if there
@@ -86,7 +87,7 @@ impl ops::Sub for Interval {
 
 #[cfg(test)]
 mod tests {
-    use pg_interval::Interval;
+    use crate::pg_interval::Interval;
 
     #[test]
     fn test_sub_day_time() {
