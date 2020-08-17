@@ -1,5 +1,4 @@
-use pg_interval::Interval;
-use interval_norm::IntervalNorm;
+use crate::{Interval, interval_norm::IntervalNorm};
 use chrono::Duration;
 
 const NANOS_PER_SEC: i64 = 1_000_000_000;
@@ -47,9 +46,8 @@ fn reduce_by_units(nano_secs: i64, unit: i64) -> (i64, i64) {
 
 #[cfg(test)]
 mod tests {
-    use pg_interval::Interval;
+    use super::*;
     use chrono::Duration;
-
 
     #[test]
     fn can_convert_small_amount_of_days() {

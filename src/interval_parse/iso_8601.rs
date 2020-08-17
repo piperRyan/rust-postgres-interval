@@ -3,8 +3,7 @@ use super::{
     scale_date, scale_time, DAYS_PER_MONTH, HOURS_PER_DAY, MICROS_PER_SECOND, MINUTES_PER_HOUR,
     MONTHS_PER_YEAR, SECONDS_PER_MIN,
 };
-use interval_norm::IntervalNorm;
-use pg_interval::Interval;
+use crate::{Interval, interval_norm::IntervalNorm};
 
 enum ParserCode {
     BADFORMAT,
@@ -131,7 +130,7 @@ fn parse_number<'a>(number: &'a mut String) -> Result<f64, ParseError> {
 
 #[cfg(test)]
 mod tests {
-    use pg_interval::Interval;
+    use super::*;
 
     #[test]
     fn test_from_iso_1() {

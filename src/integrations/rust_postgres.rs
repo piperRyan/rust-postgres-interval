@@ -1,13 +1,13 @@
-use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
-use postgres::types::{FromSql, IsNull, ToSql, Type, INTERVAL};
+use postgres_types::{FromSql, IsNull, ToSql, Type, to_sql_checked};
 use std::error::Error;
-use Interval;
+use crate::Interval;
+use bytes::{BufMut, BytesMut, Buf};
 
-impl FromSql for Interval {
-    fn from_sql(_: &Type, mut raw: &[u8]) -> Result<Interval, Box<Error + Sync + Send>> {
-        let microseconds: i64 = raw.read_i64::<BigEndian>()?;
-        let days: i32 = raw.read_i32::<BigEndian>()?;
-        let months: i32 = raw.read_i32::<BigEndian>()?;
+impl<'a> FromSql<'a> for Interval {
+    fn from_sql(_: &Type, mut raw: &'a [u8]) -> Result<Self, Box<dyn Error + Sync + Send>>  {
+        let microseconds = raw.get_i64();
+        let days = raw.get_i32();
+        let months = raw.get_i32();
 
         Ok(Interval {
             months,
@@ -17,27 +17,21 @@ impl FromSql for Interval {
     }
 
     fn accepts(ty: &Type) -> bool {
-        match *ty {
-            INTERVAL => true,
-            _ => false,
-        }
+        matches!(*ty, Type::INTERVAL)
     }
 }
 
 impl ToSql for Interval {
-    fn to_sql(&self, _: &Type, out: &mut Vec<u8>) -> Result<IsNull, Box<Error + Sync + Send>> {
-        out.write_i64::<BigEndian>(self.microseconds)?;
-        out.write_i32::<BigEndian>(self.days)?;
-        out.write_i32::<BigEndian>(self.months)?;
+    fn to_sql(&self, _: &Type, out: &mut BytesMut) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
+        out.put_i64(self.microseconds);
+        out.put_i32(self.days);
+        out.put_i32(self.months);
 
         Ok(IsNull::No)
     }
 
     fn accepts(ty: &Type) -> bool {
-        match *ty {
-            INTERVAL => true,
-            _ => false,
-        }
+        matches!(*ty, Type::INTERVAL)
     }
 
     to_sql_checked!();
