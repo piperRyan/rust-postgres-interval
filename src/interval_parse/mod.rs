@@ -11,7 +11,7 @@ static MICROS_PER_SECOND: i32 = 1_000_000;
 
 fn scale_date(val: f64, scale: i32) -> (i32, i32) {
     if val.fract() == 0.0 {
-        return (val.trunc() as i32, 0);
+        (val.trunc() as i32, 0)
     } else {
         // matches postgres implementation of just truncating.
         let sub_value = (val.fract() * scale as f64).round() as i32;
@@ -21,7 +21,7 @@ fn scale_date(val: f64, scale: i32) -> (i32, i32) {
 
 fn scale_time(val: f64, scale: i32) -> (i64, i64) {
     if val.fract() == 0.0 {
-        return (val.trunc() as i64, 0);
+        (val.trunc() as i64, 0)
     } else {
         // matches postgres implementation of just truncating.
         let sub_value = (val.fract() * scale as f64).round() as i64;

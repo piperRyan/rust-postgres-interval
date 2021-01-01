@@ -155,5 +155,4 @@ mod tests {
         let result = interval.checked_sub(interval_sub);
         assert_eq!(result, None);
     }
-
 }

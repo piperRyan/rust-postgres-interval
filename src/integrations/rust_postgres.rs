@@ -1,10 +1,10 @@
-use postgres_types::{FromSql, IsNull, ToSql, Type, to_sql_checked};
-use std::error::Error;
 use crate::Interval;
-use bytes::{BufMut, BytesMut, Buf};
+use bytes::{Buf, BufMut, BytesMut};
+use postgres_types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
+use std::error::Error;
 
 impl<'a> FromSql<'a> for Interval {
-    fn from_sql(_: &Type, mut raw: &'a [u8]) -> Result<Self, Box<dyn Error + Sync + Send>>  {
+    fn from_sql(_: &Type, mut raw: &'a [u8]) -> Result<Self, Box<dyn Error + Sync + Send>> {
         let microseconds = raw.get_i64();
         let days = raw.get_i32();
         let months = raw.get_i32();

@@ -56,6 +56,7 @@ mod tests {
     #[test]
     fn test_clone() {
         let interval = Interval::new(1, 1, 30);
+        #[allow(clippy::clippy::clone_on_copy)]
         let test_interval = interval.clone();
         assert_eq!(interval, test_interval);
     }
@@ -437,5 +438,4 @@ mod tests {
         let output = interval.to_sql();
         assert_eq!(String::from("-1:10:15"), output);
     }
-
 }
