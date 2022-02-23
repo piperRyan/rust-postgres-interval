@@ -1,4 +1,4 @@
-use interval_norm::IntervalNorm;
+use crate::interval_norm::IntervalNorm;
 
 impl IntervalNorm {
     /// Produces a postgres compliant interval string.

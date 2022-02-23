@@ -1,22 +1,21 @@
-use super::parse_error::ParseError;
 use super::{
     scale_date, scale_time, DAYS_PER_MONTH, HOURS_PER_DAY, MICROS_PER_SECOND, MINUTES_PER_HOUR,
     MONTHS_PER_YEAR, SECONDS_PER_MIN,
 };
-use interval_norm::IntervalNorm;
-use pg_interval::Interval;
+use super::parse_error::ParseError;
+use crate::{interval_norm::IntervalNorm, Interval};
 
 enum ParserCode {
-    BADFORMAT,
-    GOOD,
-    DELIMFOUND,
+    BadFormat,
+    Good,
+    DelimFound,
 }
 
 impl Interval {
-    pub fn from_iso<'a>(iso_str: &'a str) -> Result<Interval, ParseError> {
+    pub fn from_iso(iso_str: &str) -> Result<Interval, ParseError> {
         let mut date_part = true;
         let delim = vec!['Y', 'M', 'D', 'H', 'S'];
-        let mut number = "".to_owned();
+        let mut number = String::new();
         let mut interval_norm = IntervalNorm::default();
         if iso_str.rfind('P').map_or(false, |v| v == 1) {
             Err(ParseError::from_invalid_interval(
@@ -37,13 +36,13 @@ impl Interval {
                 }
                 let code = consume_number(&x, &mut number, &delim);
                 match code {
-                    ParserCode::BADFORMAT => {
+                    ParserCode::BadFormat => {
                         return Err(ParseError::from_invalid_interval("Invalid format."));
                     }
-                    ParserCode::GOOD => {
+                    ParserCode::Good => {
                         continue;
                     }
-                    ParserCode::DELIMFOUND => {
+                    ParserCode::DelimFound => {
                         let val = parse_number(&mut number)?;
                         match x {
                             'Y' => {
@@ -91,7 +90,7 @@ impl Interval {
                     }
                 }
             }
-            if number != "" {
+            if !number.is_empty() {
                 Err(ParseError::from_invalid_interval(
                     "Invalid format could not parse whole interval.",
                 ))
@@ -102,24 +101,20 @@ impl Interval {
     }
 }
 
-fn consume_number<'a>(val: &'a char, number: &'a mut String, delim: &'a Vec<char>) -> ParserCode {
-    if val.is_digit(10) {
+fn consume_number<'a>(val: &'a char, number: &'a mut String, delim: &[char]) -> ParserCode {
+    let is_first_char = number.is_empty() && *val == '-'; 
+    let is_period_char = !number.is_empty() && *val == '.';
+    if val.is_digit(10) || is_first_char || is_period_char {
         number.push(*val);
-        ParserCode::GOOD
-    } else if number.len() == 0 && *val == '-' {
-        number.push(*val);
-        ParserCode::GOOD
-    } else if number.len() != 0 && *val == '.' {
-        number.push(*val);
-        ParserCode::GOOD
-    } else if delim.contains(&val) {
-        ParserCode::DELIMFOUND
+        ParserCode::Good
+    } else if delim.contains(val) {
+        ParserCode::DelimFound
     } else {
-        ParserCode::BADFORMAT
+        ParserCode::BadFormat
     }
 }
 
-fn parse_number<'a>(number: &'a mut String) -> Result<f64, ParseError> {
+fn parse_number(number: &mut String) -> Result<f64, ParseError> {
     let parse_num = number.parse::<f64>()?;
     if parse_num > i32::max_value() as f64 {
         Err(ParseError::from_invalid_interval("Exceeded max value"))
@@ -131,7 +126,7 @@ fn parse_number<'a>(number: &'a mut String) -> Result<f64, ParseError> {
 
 #[cfg(test)]
 mod tests {
-    use pg_interval::Interval;
+    use super::*;
 
     #[test]
     fn test_from_iso_1() {
