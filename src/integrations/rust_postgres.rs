@@ -1,13 +1,13 @@
 use crate::Interval;
 use bytes::{Buf, BufMut, BytesMut};
+use std::error::Error;
 use postgres_types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
 
 impl<'a> FromSql<'a> for Interval {
     fn from_sql(_: &Type, mut raw: &'a [u8]) -> Result<Self, Box<dyn Error + Sync + Send>> {
-        let microseconds: i64 = raw.read_i64::<BigEndian>()?;
-        let days: i32 = raw.read_i32::<BigEndian>()?;
-        let months: i32 = raw.read_i32::<BigEndian>()?;
-
+        let microseconds = raw.get_i64();
+        let days = raw.get_i32();
+        let months = raw.get_i32();
         Ok(Interval {
             months,
             days,
