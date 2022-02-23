@@ -1,5 +1,4 @@
-use pg_interval::Interval;
-use interval_norm::IntervalNorm;
+use crate::{interval_norm::IntervalNorm, Interval};
 use chrono::Duration;
 
 const NANOS_PER_SEC: i64 = 1_000_000_000;
@@ -30,10 +29,10 @@ impl Interval {
             years: 0,
             months: 0,
             days: days as i32,
-            hours: hours,
-            minutes: minutes,
-            seconds: seconds,
-            microseconds: microseconds,
+            hours,
+            minutes,
+            seconds,
+            microseconds,
         };
         norm_interval.try_into_interval().ok()
     }
@@ -47,7 +46,7 @@ fn reduce_by_units(nano_secs: i64, unit: i64) -> (i64, i64) {
 
 #[cfg(test)]
 mod tests {
-    use pg_interval::Interval;
+    use super::*;
     use chrono::Duration;
 
 

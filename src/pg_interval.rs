@@ -1,4 +1,4 @@
-use interval_norm::IntervalNorm;
+use crate::interval_norm::IntervalNorm;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Interval {

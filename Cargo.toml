@@ -1,6 +1,7 @@
 [package]
 name = "pg_interval"
-version = "0.3.0"
+version = "0.4.1"
+edition = "2018"
 authors = ["Ryan Piper <piper.ryan235@gmail.com>"]
 license = "MIT"
 description = "A native PostgreSQL interval type"
@@ -11,9 +12,9 @@ include = ["src/*", "Cargo.toml", "LICENSE", "README.md"]
 categories = ["date-and-time"]
 
 [features]
-default = ["postgres"]
+default = ["postgres-types"]
 
 [dependencies]
-postgres = { version = "^0.15", optional=true }
-byteorder = { version = "1.2.4" }
 chrono = { version = "^0.4" }
+bytes = { version = "^1" }
+postgres-types = { version = "^0.2", optional = true }

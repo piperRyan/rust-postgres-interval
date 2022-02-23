@@ -1,5 +1,4 @@
-use interval_parse::parse_error::ParseError;
-use pg_interval::Interval;
+use crate::{interval_parse::parse_error::ParseError, Interval};
 
 pub struct IntervalNorm {
     pub years: i32,
@@ -58,13 +57,12 @@ impl IntervalNorm {
             .and_then(|seconds| seconds.checked_mul(1_000_000))
             .and_then(|microseconds| self.microseconds.checked_add(microseconds));
         Ok(Interval {
-            months: months.ok_or(ParseError::from_year_month(
-                "Invalid year/month interval overflow detected.",
-            ))?,
+            months: months.ok_or_else(|| {
+                ParseError::from_year_month("Invalid year/month interval overflow detected.")
+            })?,
             days: self.days,
-            microseconds: microseconds.ok_or(ParseError::from_time(
-                "Invalid time interval overflow detected.",
-            ))?,
+            microseconds: microseconds
+            .ok_or_else(|| ParseError::from_time("Invalid time interval overflow detected."))?,
         })
     }
 

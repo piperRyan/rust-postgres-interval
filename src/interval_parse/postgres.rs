@@ -1,6 +1,5 @@
 use super::parse_error::ParseError;
-use interval_norm::IntervalNorm;
-use pg_interval::Interval;
+use crate::{interval_norm::IntervalNorm, Interval};
 
 use super::{
     scale_date, scale_time, DAYS_PER_MONTH, HOURS_PER_DAY, MICROS_PER_SECOND, MINUTES_PER_HOUR,
@@ -8,13 +7,12 @@ use super::{
 };
 
 impl Interval {
-    pub fn from_postgres<'a>(iso_str: &'a str) -> Result<Interval, ParseError> {
+     pub fn from_postgres(iso_str: &str) -> Result<Interval, ParseError> {
         let mut delim = vec![
             "years", "months", "mons", "days", "hours", "minutes", "seconds",
         ];
-        let mut time_tokens = iso_str.split(" ").collect::<Vec<&str>>();
-        // clean up empty values caused by n spaces between values.
-        time_tokens.retain(|&token| token != "");
+        let mut time_tokens = iso_str.split(' ').collect::<Vec<&str>>();        // clean up empty values caused by n spaces between values.
+        time_tokens.retain(|&token| !token.is_empty());
         // since there might not be space between the delim and the
         // value we need to scan each token.
         let mut final_tokens = Vec::with_capacity(time_tokens.len());
@@ -51,7 +49,7 @@ impl Interval {
 }
 
 /// Does the token contain both alphabetic and numeric characters?
-fn is_token_alphanumeric<'a>(val: &'a str) -> Result<bool, ParseError> {
+fn is_token_alphanumeric(val: &str) -> Result<bool, ParseError> {
     let mut has_numeric = false;
     let mut has_alpha = false;
     for character in val.chars() {
@@ -70,7 +68,7 @@ fn is_token_alphanumeric<'a>(val: &'a str) -> Result<bool, ParseError> {
 
 /// Split the token into two tokens as they might of not been
 /// seperated by a space.
-fn split_token<'a>(val: &'a str) -> Result<(String, String), ParseError> {
+fn split_token(val: &str) -> Result<(String, String), ParseError> {
     let mut is_numeric_done = false;
     let mut value = String::new();
     let mut delim = String::new();
@@ -155,7 +153,7 @@ fn consume_token<'a>(
 
 #[cfg(test)]
 mod tests {
-    use pg_interval::Interval;
+    use super::*;
 
     #[test]
     fn test_from_postgres_1() {
