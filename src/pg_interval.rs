@@ -313,6 +313,13 @@ mod tests {
     }
 
     #[test]
+    fn test_postgres_19(){
+        let interval = Interval::new(0, 3, 0);
+        let output = interval.to_postgres();
+        assert_eq!(String::from("3 days"), output);
+    }
+
+    #[test]
     fn test_sql_1() {
         let interval = Interval::new(12, 0, 0);
         let output = interval.to_sql();
