@@ -81,6 +81,7 @@ impl IntervalNorm {
     pub fn is_zeroed(&self) -> bool {
         self.years == 0
             && self.months == 0
+            && self.days == 0
             && self.hours == 0
             && self.minutes == 0
             && self.seconds == 0
