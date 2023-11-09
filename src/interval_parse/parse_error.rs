@@ -1,3 +1,5 @@
+use std::error::Error;
+use std::fmt;
 use std::num::{ParseFloatError, ParseIntError};
 
 #[derive(Debug, PartialEq, Eq)]
@@ -34,6 +36,20 @@ impl From<ParseFloatError> for ParseError {
         ParseError::ParseFloatErr(error)
     }
 }
+
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            ParseError::ParseIntErr(e) => write!(f, "ParseIntErr: {}", e),
+            ParseError::ParseFloatErr(e) => write!(f, "ParseFloatErr: {}", e),
+            ParseError::InvalidYearMonth(e) => write!(f, "InvalidYearMonth: {}", e),
+            ParseError::InvalidTime(e) => write!(f, "InvalidTime: {}", e),
+            ParseError::InvalidInterval(e) => write!(f, "InvalidInterval: {}", e),
+        }
+    }
+}
+
+impl Error for ParseError {}
 
 #[cfg(test)]
 mod tests {
