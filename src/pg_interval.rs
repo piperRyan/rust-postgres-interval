@@ -35,6 +35,10 @@ impl Interval {
     pub fn to_sql(&self) -> String {
         IntervalNorm::from(self).into_sql()
     }
+
+    pub fn neg(&self) -> Self {
+        Interval::new(-self.months, -self.days, -self.microseconds)
+    }
 }
 
 #[cfg(test)]
