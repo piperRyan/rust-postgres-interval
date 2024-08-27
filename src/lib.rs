@@ -7,5 +7,6 @@ mod interval_parse;
 mod pg_interval;
 mod pg_interval_add;
 mod pg_interval_sub;
+mod pg_interval_extract;
 pub use crate::interval_parse::parse_error::ParseError;
 pub use crate::pg_interval::Interval;
