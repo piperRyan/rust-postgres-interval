@@ -1,5 +1,35 @@
 use crate::interval_norm::IntervalNorm;
 
+fn get_year_suffix(value: i32) -> &'static str {
+    if value < 0 {
+        "years"
+    } else if value.abs() == 1 {
+        "year"
+    } else {
+        "years"
+    }
+}
+
+fn get_mon_suffix(value: i32) -> &'static str {
+    if value < 0 {
+        "mons"
+    } else if value.abs() == 1 {
+        "mon"
+    } else {
+        "mons"
+    }
+}
+
+fn get_day_suffix(value: i32) -> &'static str {
+    if value < 0 {
+        "days"
+    } else if value.abs() == 1 {
+        "day"
+    } else {
+        "days"
+    }
+}
+
 impl IntervalNorm {
     /// Produces a postgres compliant interval string.
     pub fn into_postgres(self) -> String {
@@ -10,14 +40,18 @@ impl IntervalNorm {
         let mut day_interval = "".to_owned();
         let time_interval = self.get_postgres_time_interval();
         if self.is_day_present() {
-            day_interval = format!("{:#?} days ", self.days)
+            day_interval = format!("{} {} ", self.days, get_day_suffix(self.days))
         }
         if self.is_year_month_present() {
             if self.years != 0 {
-                year_interval.push_str(&*format!("{:#?} year ", self.years))
+                year_interval.push_str(&*format!("{} {} ", self.years, get_year_suffix(self.years)))
             }
             if self.months != 0 {
-                year_interval.push_str(&*format!("{:#?} mons ", self.months));
+                year_interval.push_str(&*format!(
+                    "{} {} ",
+                    self.months,
+                    get_mon_suffix(self.months)
+                ));
             }
         }
         year_interval.push_str(&*day_interval);
