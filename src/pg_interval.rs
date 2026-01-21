@@ -209,35 +209,35 @@ mod tests {
     fn test_postgres_2() {
         let interval = Interval::new(13, 0, 0);
         let output = interval.to_postgres();
-        assert_eq!(String::from("1 year 1 mons"), output);
+        assert_eq!(String::from("1 year 1 mon"), output);
     }
 
     #[test]
     fn test_postgres_3() {
         let interval = Interval::new(13, 1, 0);
         let output = interval.to_postgres();
-        assert_eq!(String::from("1 year 1 mons 1 days"), output);
+        assert_eq!(String::from("1 year 1 mon 1 day"), output);
     }
 
     #[test]
     fn test_postgres_4() {
         let interval = Interval::new(13, 1, 3600000000);
         let output = interval.to_postgres();
-        assert_eq!(String::from("1 year 1 mons 1 days 01:00:00"), output);
+        assert_eq!(String::from("1 year 1 mon 1 day 01:00:00"), output);
     }
 
     #[test]
     fn test_postgres_5() {
         let interval = Interval::new(13, 1, 4200000000);
         let output = interval.to_postgres();
-        assert_eq!(String::from("1 year 1 mons 1 days 01:10:00"), output);
+        assert_eq!(String::from("1 year 1 mon 1 day 01:10:00"), output);
     }
 
     #[test]
     fn test_postgres_6() {
         let interval = Interval::new(13, 1, 4215000000);
         let output = interval.to_postgres();
-        assert_eq!(String::from("1 year 1 mons 1 days 01:10:15"), output);
+        assert_eq!(String::from("1 year 1 mon 1 day 01:10:15"), output);
     }
 
     #[test]
@@ -265,35 +265,42 @@ mod tests {
     fn test_postgres_10() {
         let interval = Interval::new(-12, 0, 0);
         let output = interval.to_postgres();
-        assert_eq!(String::from("-1 year"), output);
+        assert_eq!(String::from("-1 years"), output);
     }
 
     #[test]
     fn test_postgres_11() {
         let interval = Interval::new(-13, 0, 0);
         let output = interval.to_postgres();
-        assert_eq!(String::from("-1 year -1 mons"), output);
+        assert_eq!(String::from("-1 years -1 mons"), output);
     }
 
     #[test]
     fn test_postgres_12() {
         let interval = Interval::new(-13, -1, 0);
         let output = interval.to_postgres();
-        assert_eq!(String::from("-1 year -1 mons -1 days"), output);
+        assert_eq!(String::from("-1 years -1 mons -1 days"), output);
     }
 
     #[test]
     fn test_postgres_13() {
         let interval = Interval::new(-13, -1, -3600000000);
         let output = interval.to_postgres();
-        assert_eq!(String::from("-1 year -1 mons -1 days -01:00:00"), output);
+        assert_eq!(String::from("-1 years -1 mons -1 days -01:00:00"), output);
     }
 
     #[test]
     fn test_postgres_14() {
         let interval = Interval::new(-13, -1, -4200000000);
         let output = interval.to_postgres();
-        assert_eq!(String::from("-1 year -1 mons -1 days -01:10:00"), output);
+        assert_eq!(String::from("-1 years -1 mons -1 days -01:10:00"), output);
+    }
+
+    #[test]
+    fn test_postgres_15() {
+        let interval = Interval::new(-13, -1, -4215000000);
+        let output = interval.to_postgres();
+        assert_eq!(String::from("-1 years -1 mons -1 days -01:10:15"), output);
     }
 
     #[test]

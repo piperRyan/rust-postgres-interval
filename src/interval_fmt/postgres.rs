@@ -1,7 +1,7 @@
 use crate::interval_norm::IntervalNorm;
 
 fn get_year_suffix(value: i32) -> &'static str {
-    if value.abs() == 1 {
+    if value == 1 {
         "year"
     } else {
         "years"
@@ -9,7 +9,7 @@ fn get_year_suffix(value: i32) -> &'static str {
 }
 
 fn get_mon_suffix(value: i32) -> &'static str {
-    if value.abs() == 1 {
+    if value == 1 {
         "mon"
     } else {
         "mons"
@@ -17,7 +17,7 @@ fn get_mon_suffix(value: i32) -> &'static str {
 }
 
 fn get_day_suffix(value: i32) -> &'static str {
-    if value.abs() == 1 {
+    if value == 1 {
         "day"
     } else {
         "days"
@@ -25,7 +25,7 @@ fn get_day_suffix(value: i32) -> &'static str {
 }
 
 fn get_hour_suffix(value: i64) -> &'static str {
-    if value.abs() == 1 {
+    if value == 1 {
         "hour"
     } else {
         "hours"
@@ -33,7 +33,7 @@ fn get_hour_suffix(value: i64) -> &'static str {
 }
 
 fn get_min_suffix(value: i64) -> &'static str {
-    if value.abs() == 1 {
+    if value == 1 {
         "min"
     } else {
         "mins"
@@ -41,7 +41,7 @@ fn get_min_suffix(value: i64) -> &'static str {
 }
 
 fn get_sec_suffix(value: i64) -> &'static str {
-    if value.abs() == 1 {
+    if value == 1 {
         "sec"
     } else {
         "secs"
@@ -58,14 +58,18 @@ impl IntervalNorm {
         let mut day_interval = "".to_owned();
         let time_interval = self.get_postgres_time_interval();
         if self.is_day_present() {
-            day_interval = format!("{:#?} days ", self.days)
+            day_interval = format!("{} {} ", self.days, get_day_suffix(self.days))
         }
         if self.is_year_month_present() {
             if self.years != 0 {
-                year_interval.push_str(&*format!("{:#?} year ", self.years))
+                year_interval.push_str(&*format!("{} {} ", self.years, get_year_suffix(self.years)))
             }
             if self.months != 0 {
-                year_interval.push_str(&*format!("{:#?} mons ", self.months));
+                year_interval.push_str(&*format!(
+                    "{} {} ",
+                    self.months,
+                    get_mon_suffix(self.months)
+                ));
             }
         }
         year_interval.push_str(&*day_interval);
@@ -116,7 +120,7 @@ impl IntervalNorm {
             } else {
                 self.years
             };
-            parts.push(format!("{} {}", abs_years, get_year_suffix(self.years)));
+            parts.push(format!("{} {}", abs_years, get_year_suffix(abs_years)));
         }
 
         if self.months != 0 {
@@ -125,12 +129,12 @@ impl IntervalNorm {
             } else {
                 self.months
             };
-            parts.push(format!("{} {}", abs_months, get_mon_suffix(self.months)));
+            parts.push(format!("{} {}", abs_months, get_mon_suffix(abs_months)));
         }
 
         if self.days != 0 {
             let abs_days = if self.days < 0 { -self.days } else { self.days };
-            parts.push(format!("{} {}", abs_days, get_day_suffix(self.days)));
+            parts.push(format!("{} {}", abs_days, get_day_suffix(abs_days)));
         }
 
         if self.hours != 0 {
@@ -139,7 +143,7 @@ impl IntervalNorm {
             } else {
                 self.hours
             };
-            parts.push(format!("{} {}", abs_hours, get_hour_suffix(self.hours)));
+            parts.push(format!("{} {}", abs_hours, get_hour_suffix(abs_hours)));
         }
 
         if self.minutes != 0 {
@@ -148,7 +152,7 @@ impl IntervalNorm {
             } else {
                 self.minutes
             };
-            parts.push(format!("{} {}", abs_minutes, get_min_suffix(self.minutes)));
+            parts.push(format!("{} {}", abs_minutes, get_min_suffix(abs_minutes)));
         }
 
         if self.seconds != 0 || self.microseconds != 0 {
@@ -167,10 +171,10 @@ impl IntervalNorm {
                 parts.push(format!(
                     "{} {}",
                     secs_with_micros,
-                    get_sec_suffix(self.seconds)
+                    get_sec_suffix(abs_seconds)
                 ));
             } else {
-                parts.push(format!("{} {}", abs_seconds, get_sec_suffix(self.seconds)));
+                parts.push(format!("{} {}", abs_seconds, get_sec_suffix(abs_seconds)));
             }
         }
 
