@@ -1,3 +1,4 @@
+use std::fmt;
 use std::num::{ParseFloatError, ParseIntError};
 
 #[derive(Debug, PartialEq, Eq)]
@@ -32,6 +33,30 @@ impl From<ParseIntError> for ParseError {
 impl From<ParseFloatError> for ParseError {
     fn from(error: ParseFloatError) -> ParseError {
         ParseError::ParseFloatErr(error)
+    }
+}
+
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ParseError::ParseIntErr(e) => write!(f, "Failed to parse integer: {}", e),
+            ParseError::ParseFloatErr(e) => write!(f, "Failed to parse float: {}", e),
+            ParseError::InvalidYearMonth(s) => write!(f, "Invalid year/month interval: {}", s),
+            ParseError::InvalidTime(s) => write!(f, "Invalid time interval: {}", s),
+            ParseError::InvalidInterval(s) => write!(f, "Invalid interval: {}", s),
+        }
+    }
+}
+
+impl std::error::Error for ParseError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            ParseError::ParseIntErr(e) => Some(e),
+            ParseError::ParseFloatErr(e) => Some(e),
+            ParseError::InvalidYearMonth(_)
+            | ParseError::InvalidTime(_)
+            | ParseError::InvalidInterval(_) => None,
+        }
     }
 }
 
