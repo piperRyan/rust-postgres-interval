@@ -32,7 +32,7 @@ jobs:
           rustflags: ""
       - name: run test
         run: |
-          $CARGO_BIN test --target ${{ matrix.target }} --verbose
+          cargo test --verbose
 
   # Check formatting with rustfmt
   formatting:
