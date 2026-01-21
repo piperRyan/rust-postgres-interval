@@ -62,7 +62,7 @@ impl IntervalNorm {
             })?,
             days: self.days,
             microseconds: microseconds
-            .ok_or_else(|| ParseError::from_time("Invalid time interval overflow detected."))?,
+                .ok_or_else(|| ParseError::from_time("Invalid time interval overflow detected."))?,
         })
     }
 

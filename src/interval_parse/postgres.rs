@@ -7,11 +7,11 @@ use super::{
 };
 
 impl Interval {
-     pub fn from_postgres(iso_str: &str) -> Result<Interval, ParseError> {
+    pub fn from_postgres(iso_str: &str) -> Result<Interval, ParseError> {
         let mut delim = vec![
             "years", "months", "mons", "days", "hours", "minutes", "seconds",
         ];
-        let mut time_tokens = iso_str.split(' ').collect::<Vec<&str>>();        // clean up empty values caused by n spaces between values.
+        let mut time_tokens = iso_str.split(' ').collect::<Vec<&str>>(); // clean up empty values caused by n spaces between values.
         time_tokens.retain(|&token| !token.is_empty());
         // since there might not be space between the delim and the
         // value we need to scan each token.
@@ -366,5 +366,4 @@ mod tests {
         let interval = Interval::from_postgres("!");
         assert_eq!(interval.is_err(), true);
     }
-
 }

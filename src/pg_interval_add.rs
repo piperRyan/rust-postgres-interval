@@ -150,5 +150,4 @@ mod tests {
         let result = interval.add_day_time(2, 0, 0, 2.123456789);
         assert_eq!(result, Interval::new(13, 2, 2123456));
     }
-
 }

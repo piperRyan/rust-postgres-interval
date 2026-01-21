@@ -1,8 +1,8 @@
+use super::parse_error::ParseError;
 use super::{
     scale_date, scale_time, DAYS_PER_MONTH, HOURS_PER_DAY, MICROS_PER_SECOND, MINUTES_PER_HOUR,
     MONTHS_PER_YEAR, SECONDS_PER_MIN,
 };
-use super::parse_error::ParseError;
 use crate::{interval_norm::IntervalNorm, Interval};
 
 enum ParserCode {
@@ -102,7 +102,7 @@ impl Interval {
 }
 
 fn consume_number<'a>(val: &'a char, number: &'a mut String, delim: &[char]) -> ParserCode {
-    let is_first_char = number.is_empty() && *val == '-'; 
+    let is_first_char = number.is_empty() && *val == '-';
     let is_period_char = !number.is_empty() && *val == '.';
     if val.is_digit(10) || is_first_char || is_period_char {
         number.push(*val);
@@ -299,5 +299,4 @@ mod tests {
         let interval_exp = Interval::new(0, 0, 10000000);
         assert_eq!(interval, interval_exp);
     }
-
 }
