@@ -7,6 +7,88 @@ use super::{
 };
 
 impl Interval {
+    pub fn from_postgres_verbose(verbose_str: &str) -> Result<Interval, ParseError> {
+        let mut is_negative = false;
+        let mut input = verbose_str.trim();
+
+        if input.starts_with('@') {
+            input = input[1..].trim_start();
+        } else {
+            return Err(ParseError::from_invalid_interval(
+                "Verbose interval must start with '@'",
+            ));
+        }
+
+        if input.ends_with("ago") {
+            is_negative = true;
+            input = input[..input.len() - 3].trim_end();
+        }
+
+        if input == "0" {
+            return Ok(Interval::new(0, 0, 0));
+        }
+
+        let mut delim = vec![
+            "years", "year", "months", "mons", "mon", "days", "day", "hours", "hour", "minutes",
+            "minute", "seconds", "second", "mins", "min", "secs", "sec",
+        ];
+        let mut time_tokens = input.split(' ').collect::<Vec<&str>>();
+        time_tokens.retain(|&token| !token.is_empty());
+
+        let mut final_tokens = Vec::with_capacity(time_tokens.len());
+        for token in time_tokens {
+            if is_token_time_format(token)? {
+                let (hours, minutes, seconds, microseconds) = parse_time_format(token)?;
+                if hours != 0 {
+                    final_tokens.push(hours.to_string());
+                    final_tokens.push("hours".to_owned());
+                }
+                if minutes != 0 {
+                    final_tokens.push(minutes.to_string());
+                    final_tokens.push("minutes".to_owned());
+                }
+                if seconds != 0 || microseconds != 0 {
+                    let total_seconds =
+                        seconds as f64 + microseconds as f64 / MICROS_PER_SECOND as f64;
+                    final_tokens.push(total_seconds.to_string());
+                    final_tokens.push("seconds".to_owned());
+                }
+            } else if is_token_alphanumeric(token)? {
+                let (val, unit) = split_token(token)?;
+                final_tokens.push(val);
+                final_tokens.push(unit);
+            } else {
+                final_tokens.push(token.to_owned());
+            }
+        }
+        if final_tokens.len() % 2 != 0 {
+            return Err(ParseError::from_invalid_interval(
+                "Invalid amount tokens were found.",
+            ));
+        }
+
+        let mut val = 0.0;
+        let mut is_numeric = true;
+        let mut interval = IntervalNorm::default();
+        for token in final_tokens {
+            if is_numeric {
+                val = token.parse::<f64>()?;
+                is_numeric = false;
+            } else {
+                consume_token(&mut interval, val, token, &mut delim)?;
+                is_numeric = true;
+            }
+        }
+        let mut result = interval.try_into_interval()?;
+
+        if is_negative {
+            result.months = -result.months;
+            result.days = -result.days;
+            result.microseconds = -result.microseconds;
+        }
+        Ok(result)
+    }
+
     pub fn from_postgres(iso_str: &str) -> Result<Interval, ParseError> {
         let mut delim = vec![
             "years", "year", "months", "mons", "mon", "days", "day", "hours", "hour", "minutes",
@@ -224,18 +306,20 @@ fn consume_token<'a>(
                 delim_list.retain(|x| *x != "hours" && *x != "hour");
                 Ok(())
             }
-            "minutes" | "minute" => {
+            "minutes" | "minute" | "mins" | "min" => {
                 let (minutes, seconds) = scale_time(val, SECONDS_PER_MIN);
                 interval.minutes += minutes;
                 interval.seconds += seconds;
-                delim_list.retain(|x| *x != "minutes" && *x != "minute");
+                delim_list
+                    .retain(|x| *x != "minutes" && *x != "minute" && *x != "mins" && *x != "min");
                 Ok(())
             }
-            "seconds" | "second" => {
+            "seconds" | "second" | "secs" | "sec" => {
                 let (seconds, microseconds) = scale_time(val, MICROS_PER_SECOND);
                 interval.seconds += seconds;
                 interval.microseconds += microseconds;
-                delim_list.retain(|x| *x != "seconds" && *x != "second");
+                delim_list
+                    .retain(|x| *x != "seconds" && *x != "second" && *x != "secs" && *x != "sec");
                 Ok(())
             }
             _ => unreachable!(),
@@ -822,5 +906,286 @@ mod tests {
             Interval::from_postgres("00:00:01").unwrap(),
             Interval::new(0, 0, 1000000)
         );
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_zero() {
+        let interval = Interval::from_postgres_verbose("@ 0").unwrap();
+        assert_eq!(interval, Interval::new(0, 0, 0));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_1_year() {
+        let interval = Interval::from_postgres_verbose("@ 1 year").unwrap();
+        assert_eq!(interval, Interval::new(12, 0, 0));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_1_year_2_mons() {
+        let interval = Interval::from_postgres_verbose("@ 1 year 2 mons").unwrap();
+        assert_eq!(interval, Interval::new(14, 0, 0));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_1_day() {
+        let interval = Interval::from_postgres_verbose("@ 1 day").unwrap();
+        assert_eq!(interval, Interval::new(0, 1, 0));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_1_hour() {
+        let interval = Interval::from_postgres_verbose("@ 1 hour").unwrap();
+        assert_eq!(interval, Interval::new(0, 0, 3600000000));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_1_min() {
+        let interval = Interval::from_postgres_verbose("@ 1 min").unwrap();
+        assert_eq!(interval, Interval::new(0, 0, 60000000));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_1_sec() {
+        let interval = Interval::from_postgres_verbose("@ 1 sec").unwrap();
+        assert_eq!(interval, Interval::new(0, 0, 1000000));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_complex() {
+        let interval =
+            Interval::from_postgres_verbose("@ 1 year 2 mons 1 day 2 hours 3 mins 4.567 secs")
+                .unwrap();
+        assert_eq!(interval, Interval::new(14, 1, 7384567000));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_negative_year() {
+        let interval = Interval::from_postgres_verbose("@ 1 year ago").unwrap();
+        assert_eq!(interval, Interval::new(-12, 0, 0));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_negative_complex() {
+        let interval =
+            Interval::from_postgres_verbose("@ 1 year 2 mons 1 day 2 hours 3 mins 4.567 secs ago")
+                .unwrap();
+        assert_eq!(interval, Interval::new(-14, -1, -7384567000));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_2_years() {
+        let interval = Interval::from_postgres_verbose("@ 2 years").unwrap();
+        assert_eq!(interval, Interval::new(24, 0, 0));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_2_mons() {
+        let interval = Interval::from_postgres_verbose("@ 2 mons").unwrap();
+        assert_eq!(interval, Interval::new(2, 0, 0));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_2_days() {
+        let interval = Interval::from_postgres_verbose("@ 2 days").unwrap();
+        assert_eq!(interval, Interval::new(0, 2, 0));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_2_hours() {
+        let interval = Interval::from_postgres_verbose("@ 2 hours").unwrap();
+        assert_eq!(interval, Interval::new(0, 0, 7200000000));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_2_mins() {
+        let interval = Interval::from_postgres_verbose("@ 2 mins").unwrap();
+        assert_eq!(interval, Interval::new(0, 0, 120000000));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_2_secs() {
+        let interval = Interval::from_postgres_verbose("@ 2 secs").unwrap();
+        assert_eq!(interval, Interval::new(0, 0, 2000000));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_microseconds() {
+        let interval = Interval::from_postgres_verbose("@ 5.678901 secs").unwrap();
+        assert_eq!(interval, Interval::new(0, 0, 5678901));
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_invalid_no_at() {
+        let interval = Interval::from_postgres_verbose("1 year");
+        assert_eq!(interval.is_err(), true);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_zero() {
+        let original = Interval::new(0, 0, 0);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_1_year() {
+        let original = Interval::new(12, 0, 0);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_1_year_2_mons() {
+        let original = Interval::new(14, 0, 0);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_1_day() {
+        let original = Interval::new(0, 1, 0);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_1_hour() {
+        let original = Interval::new(0, 0, 3600000000);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_1_min() {
+        let original = Interval::new(0, 0, 60000000);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_1_sec() {
+        let original = Interval::new(0, 0, 1000000);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_complex() {
+        let original = Interval::new(14, 1, 7384567000);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_negative_year() {
+        let original = Interval::new(-12, 0, 0);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_negative_complex() {
+        let original = Interval::new(-14, -1, -7384567000);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_2_years() {
+        let original = Interval::new(24, 0, 0);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_2_mons() {
+        let original = Interval::new(2, 0, 0);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_2_days() {
+        let original = Interval::new(0, 2, 0);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_2_hours() {
+        let original = Interval::new(0, 0, 7200000000);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_2_mins() {
+        let original = Interval::new(0, 0, 120000000);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_2_secs() {
+        let original = Interval::new(0, 0, 2000000);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_microseconds() {
+        let original = Interval::new(0, 0, 5678901);
+        let verbose_str = original.to_postgres_verbose();
+        let result = Interval::from_postgres_verbose(&verbose_str);
+        assert_eq!(result.unwrap(), original);
+    }
+
+    #[test]
+    fn test_from_postgres_verbose_roundtrip_comprehensive() {
+        let test_cases = vec![
+            Interval::new(0, 0, 0),
+            Interval::new(12, 0, 0),
+            Interval::new(14, 0, 0),
+            Interval::new(0, 1, 0),
+            Interval::new(0, 0, 3600000000),
+            Interval::new(0, 0, 60000000),
+            Interval::new(0, 0, 1000000),
+            Interval::new(14, 1, 7384567000),
+            Interval::new(-12, 0, 0),
+            Interval::new(-14, -1, -7384567000),
+            Interval::new(24, 0, 0),
+            Interval::new(2, 0, 0),
+            Interval::new(0, 2, 0),
+            Interval::new(0, 0, 7200000000),
+            Interval::new(0, 0, 120000000),
+            Interval::new(0, 0, 2000000),
+            Interval::new(0, 0, 5678901),
+        ];
+
+        for original in test_cases {
+            let verbose_str = original.to_postgres_verbose();
+            let result = Interval::from_postgres_verbose(&verbose_str).unwrap();
+            assert_eq!(
+                result, original,
+                "Roundtrip failed for {:?} -> {} -> {:?}",
+                original, verbose_str, result
+            );
+        }
     }
 }
