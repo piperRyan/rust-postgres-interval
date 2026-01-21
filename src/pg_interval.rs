@@ -27,6 +27,11 @@ impl Interval {
         IntervalNorm::from(self).into_postgres()
     }
 
+    /// Output the interval as a postgres_verbose interval string.
+    pub fn to_postgres_verbose(&self) -> String {
+        IntervalNorm::from(self).into_postgres_verbose()
+    }
+
     ///Output the interval as a sql compliant interval string.
     pub fn to_sql(&self) -> String {
         IntervalNorm::from(self).into_sql()
@@ -443,5 +448,130 @@ mod tests {
         let interval = Interval::new(0, 0, -4215000000);
         let output = interval.to_sql();
         assert_eq!(String::from("-1:10:15"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_zero() {
+        let interval = Interval::new(0, 0, 0);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 0"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_1_year() {
+        let interval = Interval::new(12, 0, 0);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 1 year"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_1_year_2_mons() {
+        let interval = Interval::new(14, 0, 0);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 1 year 2 mons"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_1_day() {
+        let interval = Interval::new(0, 1, 0);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 1 day"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_1_hour() {
+        let interval = Interval::new(0, 0, 3600000000);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 1 hour"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_1_min() {
+        let interval = Interval::new(0, 0, 60000000);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 1 min"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_1_sec() {
+        let interval = Interval::new(0, 0, 1000000);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 1 sec"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_complex() {
+        let interval = Interval::new(14, 1, 7384567000);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(
+            String::from("@ 1 year 2 mons 1 day 2 hours 3 mins 4.567 secs"),
+            output
+        );
+    }
+
+    #[test]
+    fn test_postgres_verbose_negative_year() {
+        let interval = Interval::new(-12, 0, 0);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 1 year ago"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_negative_complex() {
+        let interval = Interval::new(-14, -1, -7384567000);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(
+            String::from("@ 1 year 2 mons 1 day 2 hours 3 mins 4.567 secs ago"),
+            output
+        );
+    }
+
+    #[test]
+    fn test_postgres_verbose_2_years() {
+        let interval = Interval::new(24, 0, 0);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 2 years"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_2_mons() {
+        let interval = Interval::new(2, 0, 0);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 2 mons"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_2_days() {
+        let interval = Interval::new(0, 2, 0);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 2 days"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_2_hours() {
+        let interval = Interval::new(0, 0, 7200000000);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 2 hours"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_2_mins() {
+        let interval = Interval::new(0, 0, 120000000);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 2 mins"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_2_secs() {
+        let interval = Interval::new(0, 0, 2000000);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 2 secs"), output);
+    }
+
+    #[test]
+    fn test_postgres_verbose_microseconds() {
+        let interval = Interval::new(0, 0, 5678901);
+        let output = interval.to_postgres_verbose();
+        assert_eq!(String::from("@ 5.678901 secs"), output);
     }
 }
