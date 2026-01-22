@@ -199,6 +199,34 @@ mod tests {
     }
 
     #[test]
+    fn test_8601_19() {
+        let interval = Interval::new(0, 0, 1234567);
+        let output = interval.to_iso_8601();
+        assert_eq!(String::from("PT1.234567S"), output);
+    }
+
+    #[test]
+    fn test_8601_20() {
+        let interval = Interval::new(13, 1, 4215001000);
+        let output = interval.to_iso_8601();
+        assert_eq!(String::from("P1Y1M1DT1H10M15.001000S"), output);
+    }
+
+    #[test]
+    fn test_8601_21() {
+        let interval = Interval::new(0, 0, -1234567);
+        let output = interval.to_iso_8601();
+        assert_eq!(String::from("PT-1.234567S"), output);
+    }
+
+    #[test]
+    fn test_8601_22() {
+        let interval = Interval::new(0, 0, 500000);
+        let output = interval.to_iso_8601();
+        assert_eq!(String::from("PT.500000S"), output);
+    }
+
+    #[test]
     fn test_postgres_1() {
         let interval = Interval::new(12, 0, 0);
         let output = interval.to_postgres();
