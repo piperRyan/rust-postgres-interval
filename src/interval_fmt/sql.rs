@@ -51,11 +51,16 @@ fn get_time_interval(
 ) -> String {
     let mut interval = "".to_owned();
     if is_time_interval_pos && is_only_time {
-        interval.push_str(&format!("{}:{:02}:{:02}", hours, mins, secs));
+        interval.push_str(&format!("{:02}:{:02}:{:02}", hours, mins, secs));
     } else {
+        let sign = if hours < 0 { "-" } else { "+" };
+        let hours_abs = super::safe_abs_u64(hours);
         let minutes = super::safe_abs_u64(mins);
         let seconds = super::safe_abs_u64(secs);
-        interval.push_str(&format!("{:+}:{:02}:{:02}", hours, minutes, seconds));
+        interval.push_str(&format!(
+            "{}{:02}:{:02}:{:02}",
+            sign, hours_abs, minutes, seconds
+        ));
     }
     if micros != 0 {
         let microseconds = format!(".{:06}", super::safe_abs_u64(micros));
