@@ -3,7 +3,7 @@ use crate::interval_norm::IntervalNorm;
 impl IntervalNorm {
     pub fn into_sql(self) -> String {
         if self.is_zeroed() {
-            "0".to_owned()
+            "00:00:00".to_owned()
         } else if !self.is_time_present() && !self.is_day_present() {
             get_year_month(self.months, self.years, true)
         } else if !self.is_time_present() && !self.is_year_month_present() {

@@ -444,6 +444,13 @@ mod tests {
     }
 
     #[test]
+    fn test_sql_zero_interval() {
+        let interval = Interval::new(0, 0, 0);
+        let output = interval.to_sql();
+        assert_eq!(String::from("00:00:00"), output);
+    }
+
+    #[test]
     fn test_sql_10() {
         let interval = Interval::new(-12, 0, 0);
         let output = interval.to_sql();
