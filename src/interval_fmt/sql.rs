@@ -3,7 +3,7 @@ use crate::interval_norm::IntervalNorm;
 impl IntervalNorm {
     pub fn into_sql(self) -> String {
         if self.is_zeroed() {
-            "0".to_owned()
+            "00:00:00".to_owned()
         } else if !self.is_time_present() && !self.is_day_present() {
             get_year_month(self.months, self.years, true)
         } else if !self.is_time_present() && !self.is_year_month_present() {
@@ -51,11 +51,16 @@ fn get_time_interval(
 ) -> String {
     let mut interval = "".to_owned();
     if is_time_interval_pos && is_only_time {
-        interval.push_str(&format!("{}:{:02}:{:02}", hours, mins, secs));
+        interval.push_str(&format!("{:02}:{:02}:{:02}", hours, mins, secs));
     } else {
+        let sign = if hours < 0 { "-" } else { "+" };
+        let hours_abs = super::safe_abs_u64(hours);
         let minutes = super::safe_abs_u64(mins);
         let seconds = super::safe_abs_u64(secs);
-        interval.push_str(&format!("{:+}:{:02}:{:02}", hours, minutes, seconds));
+        interval.push_str(&format!(
+            "{}{:02}:{:02}:{:02}",
+            sign, hours_abs, minutes, seconds
+        ));
     }
     if micros != 0 {
         let microseconds = format!(".{:06}", super::safe_abs_u64(micros));

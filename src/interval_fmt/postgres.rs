@@ -40,8 +40,8 @@ fn get_min_suffix(value: i64) -> &'static str {
     }
 }
 
-fn get_sec_suffix(value: i64) -> &'static str {
-    if value == 1 {
+fn get_sec_suffix(seconds: i64, microseconds: i64) -> &'static str {
+    if seconds == 1 && microseconds == 0 {
         "sec"
     } else {
         "secs"
@@ -171,10 +171,14 @@ impl IntervalNorm {
                 parts.push(format!(
                     "{} {}",
                     secs_with_micros,
-                    get_sec_suffix(abs_seconds)
+                    get_sec_suffix(abs_seconds, abs_micros)
                 ));
             } else {
-                parts.push(format!("{} {}", abs_seconds, get_sec_suffix(abs_seconds)));
+                parts.push(format!(
+                    "{} {}",
+                    abs_seconds,
+                    get_sec_suffix(abs_seconds, abs_micros)
+                ));
             }
         }
 
