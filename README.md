@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/piperRyan/rust-postgres-interval.svg?branch=master)](https://travis-ci.org/piperRyan/rust-postgres-interval) [![codecov](https://codecov.io/gh/piperRyan/rust-postgres-interval/branch/master/graph/badge.svg)](https://codecov.io/gh/piperRyan/rust-postgres-interval)
-
 # Rust-Postgres-Interval
-A interval type for the postgres driver.
+A interval type for the postgres driver. Forked version.
+
+Crate name on crates.io: `pg_interval_2`.
 
 # Contributing
 
@@ -23,18 +23,3 @@ fn main() {
     assert_eq!(String::from("P1Y1M1DT1H"), output);
 }
 ```
-
-## Requirements
-- rust 1.22
-
-## Roadmap to 1.0.0
-
-- [x] Convert Interval Into Formated String
-    - [x] Iso 8601
-    - [x] Postgres
-    - [x] Sql
-- [ ] Parse Formated Strings Into The Interval Type
-    - [x] Iso 8601
-    - [x] Postgres
-    - [ ] Sql
-- [x] Chrono Integrations
