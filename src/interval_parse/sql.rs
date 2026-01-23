@@ -29,6 +29,7 @@ impl Interval {
                 parse_time_part(tokens[1], &mut interval_norm, true)?;
             }
             3 => {
+                // Mixed format: year-month + day + time
                 parse_year_month_part(tokens[0], &mut interval_norm)?;
                 parse_day_part(tokens[1], &mut interval_norm)?;
                 parse_time_part(tokens[2], &mut interval_norm, false)?;
@@ -45,12 +46,10 @@ impl Interval {
 }
 
 fn parse_year_month_part(token: &str, interval: &mut IntervalNorm) -> Result<(), ParseError> {
-    let token = token.trim_start_matches('+');
-
     let (sign, rest) = if let Some(stripped) = token.strip_prefix('-') {
         (-1, stripped)
     } else {
-        (1, token)
+        (1, token.trim_start_matches('+'))
     };
 
     let (years_str, months_str) = if let Some(pos) = rest.find('-') {
@@ -75,8 +74,16 @@ fn parse_year_month_part(token: &str, interval: &mut IntervalNorm) -> Result<(),
 }
 
 fn parse_day_part(token: &str, interval: &mut IntervalNorm) -> Result<(), ParseError> {
-    let days: i32 = token.parse()?;
-    interval.days = days;
+    // Handle optional leading sign
+    let (sign, days_str) = if let Some(rest) = token.strip_prefix('-') {
+        (-1, rest)
+    } else if let Some(rest) = token.strip_prefix('+') {
+        (1, rest)
+    } else {
+        (1, token)
+    };
+    let days: i32 = days_str.parse()?;
+    interval.days = days * sign;
     Ok(())
 }
 
