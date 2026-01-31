@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_checked_sub_day_time_2() {
-        let interval = Interval::new(13, i32::min_value(), 0);
+        let interval = Interval::new(13, i32::MIN, 0);
         println!("{:?}", interval.days);
         let result = interval.checked_sub_day_time(100, 0, 0, 2.12);
         println!("{:?}", result);
@@ -128,7 +128,7 @@ mod tests {
     #[test]
     fn test_checked_sub_year_month_2() {
         let interval = Interval::new(-20, 0, 0);
-        let result = interval.checked_sub_year_month(i32::min_value(), 1);
+        let result = interval.checked_sub_year_month(i32::MIN, 1);
         assert_eq!(result, None);
     }
 
@@ -151,9 +151,8 @@ mod tests {
     #[test]
     fn test_checked_sub_2() {
         let interval = Interval::new(-10, 0, 0);
-        let interval_sub = Interval::new(i32::max_value(), 0, 0);
+        let interval_sub = Interval::new(i32::MAX, 0, 0);
         let result = interval.checked_sub(interval_sub);
         assert_eq!(result, None);
     }
-
 }

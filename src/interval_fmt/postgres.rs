@@ -14,14 +14,14 @@ impl IntervalNorm {
         }
         if self.is_year_month_present() {
             if self.years != 0 {
-                year_interval.push_str(&*format!("{:#?} year ", self.years))
+                year_interval.push_str(&format!("{:#?} year ", self.years))
             }
             if self.months != 0 {
-                year_interval.push_str(&*format!("{:#?} mons ", self.months));
+                year_interval.push_str(&format!("{:#?} mons ", self.months));
             }
         }
-        year_interval.push_str(&*day_interval);
-        year_interval.push_str(&*time_interval);
+        year_interval.push_str(&day_interval);
+        year_interval.push_str(&time_interval);
         year_interval.trim().to_owned()
     }
 
@@ -35,7 +35,7 @@ impl IntervalNorm {
             };
             let hours = super::pad_i64(self.hours);
             time_interval.push_str(
-                &*(sign
+                &(sign
                     + &hours
                     + ":"
                     + &super::pad_i64(self.minutes)
@@ -43,7 +43,7 @@ impl IntervalNorm {
                     + &super::pad_i64(self.seconds)),
             );
             if self.microseconds != 0 {
-                time_interval.push_str(&*format!(".{:06}", super::safe_abs_u64(self.microseconds)))
+                time_interval.push_str(&format!(".{:06}", super::safe_abs_u64(self.microseconds)))
             }
         }
         time_interval

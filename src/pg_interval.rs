@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn test_clone() {
         let interval = Interval::new(1, 1, 30);
-        let test_interval = interval.clone();
+        let test_interval = interval;
         assert_eq!(interval, test_interval);
     }
 
@@ -313,7 +313,7 @@ mod tests {
     }
 
     #[test]
-    fn test_postgres_19(){
+    fn test_postgres_19() {
         let interval = Interval::new(0, 3, 0);
         let output = interval.to_postgres();
         assert_eq!(String::from("3 days"), output);
@@ -444,5 +444,4 @@ mod tests {
         let output = interval.to_sql();
         assert_eq!(String::from("-1:10:15"), output);
     }
-
 }

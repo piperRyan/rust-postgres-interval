@@ -7,7 +7,7 @@ use std::ops::Neg;
 /// Safely maps a i64 value to a unsigned number
 /// without any overflow issues.
 fn safe_abs_u64(mut num: i64) -> u64 {
-    let max = i64::max_value();
+    let max = i64::MAX;
     let max_min = max.neg();
     if num <= max_min {
         let result = max as u64;
@@ -15,14 +15,14 @@ fn safe_abs_u64(mut num: i64) -> u64 {
         num *= -1;
         result + num as u64
     } else {
-        num.abs() as u64
+        num.unsigned_abs()
     }
 }
 
 /// Safely maps a i32 value to a unsigned number
 /// without any overflow issues.
 fn safe_abs_u32(mut num: i32) -> u32 {
-    let max = i32::max_value();
+    let max = i32::MAX;
     let max_min = max.neg();
     if num <= max_min {
         let result = max as u32;
@@ -30,7 +30,7 @@ fn safe_abs_u32(mut num: i32) -> u32 {
         num *= -1;
         result + num as u32
     } else {
-        num.abs() as u32
+        num.unsigned_abs()
     }
 }
 
@@ -41,7 +41,7 @@ fn pad_i64(val: i64) -> String {
     } else {
         val as u64
     };
-    return format!("{:02}", num);
+    format!("{:02}", num)
 }
 
 #[cfg(test)]
@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn abs_safe_u32() {
-        let min = i32::min_value();
+        let min = i32::MIN;
         let actual = safe_abs_u32(min);
         let expected = 2147483648;
         assert_eq!(actual, expected);
@@ -58,7 +58,7 @@ mod tests {
 
     #[test]
     fn abs_safe_u64() {
-        let min = i64::min_value();
+        let min = i64::MIN;
         let actual = safe_abs_u64(min);
         let expected = 9_223_372_036_854_775_808;
         assert_eq!(actual, expected);

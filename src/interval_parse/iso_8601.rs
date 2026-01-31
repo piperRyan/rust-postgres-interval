@@ -1,8 +1,8 @@
+use super::parse_error::ParseError;
 use super::{
     scale_date, scale_time, DAYS_PER_MONTH, HOURS_PER_DAY, MICROS_PER_SECOND, MINUTES_PER_HOUR,
     MONTHS_PER_YEAR, SECONDS_PER_MIN,
 };
-use super::parse_error::ParseError;
 use crate::{interval_norm::IntervalNorm, Interval};
 
 enum ParserCode {
@@ -17,7 +17,7 @@ impl Interval {
         let delim = vec!['Y', 'M', 'D', 'H', 'S'];
         let mut number = String::new();
         let mut interval_norm = IntervalNorm::default();
-        if iso_str.rfind('P').map_or(false, |v| v == 1) {
+        if iso_str.rfind('P') == Some(1) {
             Err(ParseError::from_invalid_interval(
                 "Invalid format must start with P.",
             ))
@@ -102,9 +102,9 @@ impl Interval {
 }
 
 fn consume_number<'a>(val: &'a char, number: &'a mut String, delim: &[char]) -> ParserCode {
-    let is_first_char = number.is_empty() && *val == '-'; 
+    let is_first_char = number.is_empty() && *val == '-';
     let is_period_char = !number.is_empty() && *val == '.';
-    if val.is_digit(10) || is_first_char || is_period_char {
+    if val.is_ascii_digit() || is_first_char || is_period_char {
         number.push(*val);
         ParserCode::Good
     } else if delim.contains(val) {
@@ -116,7 +116,7 @@ fn consume_number<'a>(val: &'a char, number: &'a mut String, delim: &[char]) -> 
 
 fn parse_number(number: &mut String) -> Result<f64, ParseError> {
     let parse_num = number.parse::<f64>()?;
-    if parse_num > i32::max_value() as f64 {
+    if parse_num > i32::MAX as f64 {
         Err(ParseError::from_invalid_interval("Exceeded max value"))
     } else {
         *number = "".to_owned();
@@ -257,19 +257,19 @@ mod tests {
     #[test]
     fn test_from_8601_19() {
         let interval = Interval::from_iso("PTT");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
     fn test_from_8601_20() {
         let interval = Interval::from_iso("PT-");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
     fn test_from_8601_21() {
         let interval = Interval::from_iso("PT10");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
@@ -299,5 +299,4 @@ mod tests {
         let interval_exp = Interval::new(0, 0, 10000000);
         assert_eq!(interval, interval_exp);
     }
-
 }
