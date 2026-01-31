@@ -36,8 +36,8 @@ impl IntervalNorm {
         if self.days != 0 {
             day_interval.push_str(&format!("{}D", self.days));
         }
-        year_interval.push_str(&*day_interval);
-        year_interval.push_str(&*time_interval);
+        year_interval.push_str(&day_interval);
+        year_interval.push_str(&time_interval);
         year_interval
     }
 }

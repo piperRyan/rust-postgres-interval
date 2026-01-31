@@ -1,7 +1,7 @@
 use crate::Interval;
 use bytes::{Buf, BufMut, BytesMut};
-use std::error::Error;
 use postgres_types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
+use std::error::Error;
 
 impl<'a> FromSql<'a> for Interval {
     fn from_sql(_: &Type, mut raw: &'a [u8]) -> Result<Self, Box<dyn Error + Sync + Send>> {

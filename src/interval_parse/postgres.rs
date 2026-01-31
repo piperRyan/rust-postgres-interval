@@ -7,11 +7,11 @@ use super::{
 };
 
 impl Interval {
-     pub fn from_postgres(iso_str: &str) -> Result<Interval, ParseError> {
+    pub fn from_postgres(iso_str: &str) -> Result<Interval, ParseError> {
         let mut delim = vec![
             "years", "months", "mons", "days", "hours", "minutes", "seconds",
         ];
-        let mut time_tokens = iso_str.split(' ').collect::<Vec<&str>>();        // clean up empty values caused by n spaces between values.
+        let mut time_tokens = iso_str.split(' ').collect::<Vec<&str>>(); // clean up empty values caused by n spaces between values.
         time_tokens.retain(|&token| !token.is_empty());
         // since there might not be space between the delim and the
         // value we need to scan each token.
@@ -88,11 +88,11 @@ fn split_token(val: &str) -> Result<(String, String), ParseError> {
 }
 
 /// Consume the token parts and add to the normalized interval.
-fn consume_token<'a>(
+fn consume_token(
     interval: &mut IntervalNorm,
     val: f64,
     delim: String,
-    delim_list: &mut Vec<&'a str>,
+    delim_list: &mut Vec<&str>,
 ) -> Result<(), ParseError> {
     // Unlike iso8601 the delimiter can only appear once
     // so we need to check if the token can be found in
@@ -325,19 +325,19 @@ mod tests {
     #[test]
     fn test_from_postgres_24() {
         let interval = Interval::from_postgres("years 1");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
     fn test_from_postgres_25() {
         let interval = Interval::from_postgres("- years");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
     fn test_from_postgres_26() {
         let interval = Interval::from_postgres("10");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
@@ -364,7 +364,6 @@ mod tests {
     #[test]
     fn test_from_postgres_30() {
         let interval = Interval::from_postgres("!");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
-
 }

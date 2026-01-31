@@ -10,7 +10,7 @@ pub struct IntervalNorm {
     pub microseconds: i64,
 }
 
-impl<'a> From<&'a Interval> for IntervalNorm {
+impl From<&Interval> for IntervalNorm {
     fn from(val: &Interval) -> IntervalNorm {
         // grab the base values from the interval
         let months = val.months;
@@ -62,7 +62,7 @@ impl IntervalNorm {
             })?,
             days: self.days,
             microseconds: microseconds
-            .ok_or_else(|| ParseError::from_time("Invalid time interval overflow detected."))?,
+                .ok_or_else(|| ParseError::from_time("Invalid time interval overflow detected."))?,
         })
     }
 

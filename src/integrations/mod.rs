@@ -1,2 +1,2 @@
+mod duration;
 mod rust_postgres;
-mod duration; 
