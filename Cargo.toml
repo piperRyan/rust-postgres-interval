@@ -2,7 +2,7 @@
 name = "pg_interval"
 version = "0.4.3"
 edition = "2018"
-authors = ["Ryan Piper <piper.ryan235@gmail.com>"]
+authors = ["Ryan Piper <piper.ryan235@gmail.com>", "Ning Sun <n@sunng.info>"]
 license = "MIT"
 description = "A native PostgreSQL interval type"
 repository = "https://github.com/piperRyan/rust-postgres-interval"

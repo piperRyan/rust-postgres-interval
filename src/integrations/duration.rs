@@ -12,9 +12,9 @@ impl Interval {
         let mut days = duration.num_days();
         let mut new_dur = duration - Duration::days(days);
         let mut hours = duration.num_hours();
-        new_dur -= Duration::hours(hours);
+        new_dur = new_dur - Duration::hours(hours);
         let minutes = new_dur.num_minutes();
-        new_dur -= Duration::minutes(minutes);
+        new_dur = new_dur - Duration::minutes(minutes);
         let nano_secs = new_dur.num_nanoseconds()?;
         if days > (i32::MAX as i64) {
             let overflow_days = days - (i32::MAX as i64);

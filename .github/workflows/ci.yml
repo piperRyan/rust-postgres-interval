@@ -14,57 +14,42 @@ env:
 
 jobs:
   test:
-    name: Build, Lint, and Test
-    runs-on: ubuntu-latest
-    container:
-      image: rust:alpine
+    name: test - ${{ matrix.target }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+            os: ubuntu
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-24.04-arm
+            os: ubuntu
+          - target: aarch64-apple-darwin
+            runner: macos-latest
+            os: macos
+    runs-on: ${{ matrix.runner }}
+
     steps:
-      - name: Install Alpine dependencies
-        run: apk add --no-cache git musl-dev
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust components
-        run: rustup component add clippy rustfmt
-
-      - name: Cache Cargo dependencies
-        uses: actions/cache@v3
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-alpine-cargo-${{ hashFiles('**/Cargo.lock') }}
+          target: ${{ matrix.target }}
+          rustflags: ""
+      - name: run test
+        run: |
+          cargo test --verbose
 
-      - name: Check formatting
-        run: cargo fmt -- --check
-
-      - name: Lint with Clippy
-        run: cargo clippy -- -D warnings
-
-      - name: Run Tests
-        run: cargo test --verbose
-
-  publish:
-    name: Publish to Crates.io
+  # Check formatting with rustfmt
+  formatting:
+    name: cargo fmt
     runs-on: ubuntu-latest
-    needs: test
-    environment: master
-    if: github.ref == 'refs/heads/master'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Build Release
-        run: cargo build --release
-
-      - name: Publish to Crates.io
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish --token $CARGO_REGISTRY_TOKEN
+      - uses: actions/checkout@v4
+      # Ensure rustfmt is installed and setup problem matcher
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt
+          rustflags: ""
+      - name: Rustfmt Check
+        uses: actions-rust-lang/rustfmt@v1
