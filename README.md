@@ -1,7 +1,5 @@
 # Rust-Postgres-Interval
-A interval type for the postgres driver. Forked version.
-
-Crate name on crates.io: `pg_interval_2`.
+A interval type for the postgres driver.
 
 # Contributing
 
