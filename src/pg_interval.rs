@@ -61,7 +61,7 @@ mod tests {
     #[test]
     fn test_clone() {
         let interval = Interval::new(1, 1, 30);
-        let test_interval = interval.clone();
+        let test_interval = interval;
         assert_eq!(interval, test_interval);
     }
 

@@ -267,11 +267,11 @@ fn parse_time_format(val: &str) -> Result<(i64, i64, i64, i64), ParseError> {
 }
 
 /// Consume the token parts and add to the normalized interval.
-fn consume_token<'a>(
+fn consume_token(
     interval: &mut IntervalNorm,
     val: f64,
     delim: String,
-    delim_list: &mut Vec<&'a str>,
+    delim_list: &mut Vec<&str>,
 ) -> Result<(), ParseError> {
     // Unlike iso8601 the delimiter can only appear once
     // so we need to check if the token can be found in
@@ -506,19 +506,19 @@ mod tests {
     #[test]
     fn test_from_postgres_24() {
         let interval = Interval::from_postgres("years 1");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
     fn test_from_postgres_25() {
         let interval = Interval::from_postgres("- years");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
     fn test_from_postgres_26() {
         let interval = Interval::from_postgres("10");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]
@@ -545,7 +545,7 @@ mod tests {
     #[test]
     fn test_from_postgres_30() {
         let interval = Interval::from_postgres("!");
-        assert_eq!(interval.is_err(), true);
+        assert!(interval.is_err());
     }
 
     #[test]

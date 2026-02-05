@@ -96,7 +96,7 @@ mod tests {
     #[test]
     fn test_checked_add_2() {
         let interval = Interval::new(13, 0, 0);
-        let interval_add = Interval::new(i32::max_value(), 1, 12);
+        let interval_add = Interval::new(i32::MAX, 1, 12);
         let result = interval.checked_add(interval_add);
         assert_eq!(result, None);
     }
@@ -110,7 +110,7 @@ mod tests {
 
     #[test]
     fn test_checked_add_day_time_2() {
-        let interval = Interval::new(13, i32::max_value(), 0);
+        let interval = Interval::new(13, i32::MAX, 0);
         let result = interval.checked_add_day_time(200, 0, 0, 2.123456789);
         assert_eq!(result, None);
     }
@@ -132,7 +132,7 @@ mod tests {
     #[test]
     fn checked_add_year_month_2() {
         let interval = Interval::new(15, 0, 0);
-        let result = interval.checked_add_year_month(i32::max_value(), 32);
+        let result = interval.checked_add_year_month(i32::MAX, 32);
         assert_eq!(result, None);
     }
 
