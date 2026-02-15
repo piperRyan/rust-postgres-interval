@@ -1,9 +1,9 @@
 use super::parse_error::ParseError;
 use super::{
-    scale_date, scale_time, DAYS_PER_MONTH, HOURS_PER_DAY, MICROS_PER_SECOND, MINUTES_PER_HOUR,
-    MONTHS_PER_YEAR, SECONDS_PER_MIN,
+    DAYS_PER_MONTH, HOURS_PER_DAY, MICROS_PER_SECOND, MINUTES_PER_HOUR, MONTHS_PER_YEAR,
+    SECONDS_PER_MIN, scale_date, scale_time,
 };
-use crate::{interval_norm::IntervalNorm, Interval};
+use crate::{Interval, interval_norm::IntervalNorm};
 
 enum ParserCode {
     BadFormat,
