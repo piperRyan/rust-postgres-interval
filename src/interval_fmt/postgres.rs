@@ -62,10 +62,10 @@ impl IntervalNorm {
         }
         if self.is_year_month_present() {
             if self.years != 0 {
-                year_interval.push_str(&*format!("{} {} ", self.years, get_year_suffix(self.years)))
+                year_interval.push_str(&format!("{} {} ", self.years, get_year_suffix(self.years)))
             }
             if self.months != 0 {
-                year_interval.push_str(&*format!(
+                year_interval.push_str(&format!(
                     "{} {} ",
                     self.months,
                     get_mon_suffix(self.months)

@@ -26,7 +26,7 @@ impl IntervalNorm {
         let is_year_month_only = has_year_month && !has_day_time;
         let is_day_time_only = has_day_time && !has_year_month;
         let sql_standard_value =
-            !(has_negative && has_positive) && !(has_year_month && has_day_time);
+            !((has_negative && has_positive) || (has_year_month && has_day_time));
 
         if !has_negative && !has_positive {
             return "0".to_owned();
