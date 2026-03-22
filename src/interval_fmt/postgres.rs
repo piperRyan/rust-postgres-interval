@@ -1,43 +1,23 @@
 use crate::interval_norm::IntervalNorm;
 
 fn get_year_suffix(value: i32) -> &'static str {
-    if value == 1 {
-        "year"
-    } else {
-        "years"
-    }
+    if value == 1 { "year" } else { "years" }
 }
 
 fn get_mon_suffix(value: i32) -> &'static str {
-    if value == 1 {
-        "mon"
-    } else {
-        "mons"
-    }
+    if value == 1 { "mon" } else { "mons" }
 }
 
 fn get_day_suffix(value: i32) -> &'static str {
-    if value == 1 {
-        "day"
-    } else {
-        "days"
-    }
+    if value == 1 { "day" } else { "days" }
 }
 
 fn get_hour_suffix(value: i64) -> &'static str {
-    if value == 1 {
-        "hour"
-    } else {
-        "hours"
-    }
+    if value == 1 { "hour" } else { "hours" }
 }
 
 fn get_min_suffix(value: i64) -> &'static str {
-    if value == 1 {
-        "min"
-    } else {
-        "mins"
-    }
+    if value == 1 { "min" } else { "mins" }
 }
 
 fn get_sec_suffix(seconds: i64, microseconds: i64) -> &'static str {

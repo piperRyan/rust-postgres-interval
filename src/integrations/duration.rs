@@ -1,4 +1,4 @@
-use crate::{interval_norm::IntervalNorm, Interval};
+use crate::{Interval, interval_norm::IntervalNorm};
 use chrono::Duration;
 
 const NANOS_PER_SEC: i64 = 1_000_000_000;

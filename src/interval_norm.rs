@@ -1,4 +1,4 @@
-use crate::{interval_parse::parse_error::ParseError, Interval};
+use crate::{Interval, interval_parse::parse_error::ParseError};
 
 pub struct IntervalNorm {
     pub years: i32,
