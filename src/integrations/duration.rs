@@ -7,7 +7,7 @@ const NANOS_PER_MICRO: i64 = 1000;
 impl Interval {
     /// Tries to convert from the `Duration` type to a `Interval`. Will
     /// return `None` on a overflow. This is a lossy conversion in that
-    /// any units smaller than a microsecond will be lost.   
+    /// any units smaller than a microsecond will be lost.
     pub fn from_duration(duration: Duration) -> Option<Interval> {
         let mut days = duration.num_days();
         let mut new_dur = duration - Duration::days(days);

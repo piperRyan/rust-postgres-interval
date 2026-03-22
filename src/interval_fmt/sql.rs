@@ -1,65 +1,104 @@
 use crate::interval_norm::IntervalNorm;
 
 impl IntervalNorm {
-    pub fn into_sql(self) -> String {
-        if self.is_zeroed() {
-            "0".to_owned()
-        } else if !self.is_time_present() && !self.is_day_present() {
-            get_year_month(self.months, self.years, true)
-        } else if !self.is_time_present() && !self.is_year_month_present() {
-            format!("{} 0:00:00", self.days)
-        } else if !self.is_year_month_present() && !self.is_day_present() {
-            get_time_interval(
-                self.hours,
-                self.minutes,
-                self.seconds,
-                self.microseconds,
-                self.is_time_interval_pos(),
-                true,
-            )
+    fn format_time(
+        hours: i64,
+        minutes: i64,
+        seconds: i64,
+        microseconds: i64,
+        sign: bool,
+    ) -> String {
+        let sign_str = if sign { "-" } else { "" };
+        let time_str = format!(
+            "{}{}:{:02}:{:02}",
+            sign_str,
+            super::safe_abs_u64(hours),
+            super::safe_abs_u64(minutes),
+            super::safe_abs_u64(seconds)
+        );
+
+        if microseconds != 0 {
+            format!("{}.{:06}", time_str, super::safe_abs_u64(microseconds))
         } else {
-            let year_month = get_year_month(self.months, self.years, false);
-            let time_interval = get_time_interval(
-                self.hours,
-                self.minutes,
-                self.seconds,
-                self.microseconds,
-                self.is_time_interval_pos(),
-                false,
-            );
-            format!("{} {:+} {}", year_month, self.days, time_interval)
+            time_str
         }
     }
-}
 
-fn get_year_month(mons: i32, years: i32, is_only_year_month: bool) -> String {
-    let months = super::safe_abs_u32(mons);
-    if years == 0 || is_only_year_month {
-        format!("{}-{}", years, months)
-    } else {
-        format!("{:+}-{}", years, months)
-    }
-}
+    pub fn into_sql(self) -> String {
+        let has_negative = self.has_negative();
+        let has_positive = self.has_positive();
 
-fn get_time_interval(
-    hours: i64,
-    mins: i64,
-    secs: i64,
-    micros: i64,
-    is_time_interval_pos: bool,
-    is_only_time: bool,
-) -> String {
-    let mut interval = "".to_owned();
-    if is_time_interval_pos && is_only_time {
-        interval.push_str(&format!("{}:{:02}:{:02}", hours, mins, secs));
-    } else {
-        let minutes = super::safe_abs_u64(mins);
-        let seconds = super::safe_abs_u64(secs);
-        interval.push_str(&format!("{:+}:{:02}:{:02}", hours, minutes, seconds));
+        let has_year_month = self.is_year_month_present();
+        let has_day_time = self.is_day_present() || self.is_time_present();
+
+        let sql_standard_value = !(has_negative && has_positive || has_year_month && has_day_time);
+
+        if !has_negative && !has_positive {
+            return "0".to_owned();
+        }
+
+        if !sql_standard_value {
+            let year_sign = if self.years < 0 || self.months < 0 {
+                '-'
+            } else {
+                '+'
+            };
+            let day_sign = if self.days < 0 { '-' } else { '+' };
+            let sec_sign = if self.hours < 0
+                || self.minutes < 0
+                || self.seconds < 0
+                || self.microseconds < 0
+            {
+                '-'
+            } else {
+                '+'
+            };
+
+            let time_str = format!(
+                "{}{}:{:02}:{:02}",
+                sec_sign,
+                super::safe_abs_u64(self.hours),
+                super::safe_abs_u64(self.minutes),
+                super::safe_abs_u64(self.seconds)
+            );
+
+            let time_str = if self.microseconds != 0 {
+                format!("{}.{:06}", time_str, super::safe_abs_u64(self.microseconds))
+            } else {
+                time_str
+            };
+
+            format!(
+                "{}{}-{} {}{} {}",
+                year_sign,
+                self.years.abs(),
+                self.months.abs(),
+                day_sign,
+                self.days.abs(),
+                time_str
+            )
+        } else if has_year_month {
+            format!("{}-{}", self.years, super::safe_abs_u32(self.months))
+        } else if self.days != 0 {
+            format!(
+                "{} {}",
+                self.days,
+                Self::format_time(
+                    self.hours,
+                    self.minutes,
+                    self.seconds,
+                    self.microseconds,
+                    false
+                )
+            )
+        } else {
+            Self::format_time(
+                self.hours,
+                self.minutes,
+                self.seconds,
+                self.microseconds,
+                has_negative,
+            )
+        }
     }
-    if micros != 0 {
-        let microseconds = format!(".{:06}", super::safe_abs_u64(micros));
-        interval.push_str(&microseconds);
-    }
-    interval
 }

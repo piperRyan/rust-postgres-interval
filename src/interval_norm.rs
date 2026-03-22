@@ -109,4 +109,25 @@ impl IntervalNorm {
     pub fn is_time_present(&self) -> bool {
         self.hours != 0 || self.minutes != 0 || self.seconds != 0 || self.microseconds != 0
     }
+
+    /// is any value is negative
+    pub fn has_negative(&self) -> bool {
+        self.years < 0
+            || self.months < 0
+            || self.days < 0
+            || self.hours < 0
+            || self.minutes < 0
+            || self.seconds < 0
+            || self.microseconds < 0
+    }
+
+    pub fn has_positive(&self) -> bool {
+        self.years > 0
+            || self.months > 0
+            || self.days > 0
+            || self.hours > 0
+            || self.minutes > 0
+            || self.seconds > 0
+            || self.microseconds > 0
+    }
 }

@@ -17,12 +17,19 @@ impl IntervalNorm {
             if self.minutes != 0 {
                 time_interval.push_str(&format!("{}M", self.minutes));
             }
-            if self.seconds != 0 {
-                time_interval.push_str(&format!("{}S", self.seconds));
-            }
-            if self.microseconds != 0 {
-                let ms = super::safe_abs_u64(self.microseconds);
-                time_interval.push_str(&format!(".{:06}", ms));
+            if self.seconds != 0 || self.microseconds != 0 {
+                let secs_with_micros = if self.seconds != 0 && self.microseconds != 0 {
+                    format!(
+                        "{}.{:06}",
+                        self.seconds,
+                        super::safe_abs_u64(self.microseconds)
+                    )
+                } else if self.microseconds != 0 {
+                    format!(".{:06}", super::safe_abs_u64(self.microseconds))
+                } else {
+                    format!("{}", self.seconds)
+                };
+                time_interval.push_str(&format!("{}S", secs_with_micros));
             }
         } else {
             time_interval = "".to_owned();
