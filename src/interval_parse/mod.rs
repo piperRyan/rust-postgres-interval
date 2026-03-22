@@ -1,6 +1,7 @@
 mod iso_8601;
 pub mod parse_error;
 mod postgres;
+mod sql;
 
 static DAYS_PER_MONTH: i32 = 30;
 static MONTHS_PER_YEAR: i32 = 12;
