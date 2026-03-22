@@ -1,6 +1,6 @@
 use super::parse_error::ParseError;
-use crate::interval_norm::IntervalNorm;
 use crate::Interval;
+use crate::interval_norm::IntervalNorm;
 
 impl Interval {
     pub fn from_sql(sql_str: &str) -> Result<Interval, ParseError> {
