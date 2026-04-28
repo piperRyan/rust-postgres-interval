@@ -21,6 +21,8 @@ Before submitting you merge request(s) please review the following guidelines:
 * Implement you changes and include appropriate test cases.
 * Please follow our coding rules as indicated above.
 * If necessary please add any relevant documentation.
+* If AI tools were used, make sure the contribution follows the AI-assisted
+  contribution policy below.
 * Before pushing you branch upstream rebase your branch onto master:
 
 ```bash
@@ -48,6 +50,18 @@ git push origin <mybranch> -f
 ```
 git branch -d <mybranch>
 ```
+
+## <a name="ai"></a> AI-Assisted Contributions
+
+AI-assisted contributions are welcome when they remain under meaningful human
+direction and review. Contributors are responsible for all submitted changes,
+regardless of whether AI tools were used to draft code, documentation, tests, or
+review comments.
+
+Before opening a merge request, contributors should review, understand, and test
+the submitted changes. The project does not accept fully autonomous
+contributions, including merge requests opened, updated, or maintained by an
+unattended agent without meaningful human oversight.
 
 ## <a name="commits"></a> Git Commit Guidelines
 
